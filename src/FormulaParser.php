@@ -3,6 +3,7 @@
 namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Functions\FunctionFactory;
+use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 
 class FormulaParser
 {
@@ -34,9 +35,7 @@ class FormulaParser
         /** @var TreeNode[] $numericList */
         $numericList = [];
         $numeric = '';
-        $lastKey = '';
         $charList = str_split($formula);
-        $prioritet = false;
 
         while (($char = array_shift($charList)) != null) {
             if (preg_match('/[a-z\.0-9]/ui', $char)) {
@@ -44,7 +43,7 @@ class FormulaParser
             }
 
             if (empty($charList) || $char == ' ' && !empty($numeric)) {
-                $keyNumber = is_numeric($numeric) ? $numeric . count($this->treeNodes) : $numeric;
+                $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
 
                 if (!isset($this->treeNodes[$keyNumber])) {
                     $this->treeNodes[$keyNumber] = TreeNode::newNumber($numeric);
@@ -54,33 +53,34 @@ class FormulaParser
                 $numeric = '';
             }
 
-            if (count($numericList) % 2 == 0 && !empty($functionNode)) {
-                $second = array_pop($numericList);
-                $first = array_pop($numericList);
-
-                if ($first->getRight() == null) {
-                    $prioritet = false;
-                }
-
-                if ($prioritet) {
-                    $node = TreeNode::newNode($first->getRight(), $functionNode, $second);
-                    $first->setRight($node);
-                    $node = $first;
-                    $prioritet = false;
-                } else {
-                    $node = TreeNode::newNode($first, $functionNode, $second);
-                }
-
-                $lastKey = 'nodeKey' . count($this->treeNodes);
-                $numericList[] = $this->treeNodes[$lastKey] = $node;
-            }  elseif (isset(FunctionFactory::$map[$char])) {
-                $functionNode = FunctionFactory::factory($char);
-                if ($char === '*' || $char === '/') {
-                    $prioritet = true;
-                }
+            if (count($numericList) % 2 == 0 && !empty($function)) {
+                $numericList[] = $this->makeTree($numericList, $function);
+            } elseif (isset(FunctionFactory::$map[$char])) {
+                $function = FunctionFactory::factory($char);
             }
         }
 
-        return $lastKey;
+        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+    }
+
+    /**
+     * @param TreeNode[] $numericList
+     * @param FunctionInterface $function
+     * @return TreeNode
+     */
+    private function makeTree(array $numericList, FunctionInterface $function): TreeNode
+    {
+        $second = array_pop($numericList);
+        $first = array_pop($numericList);
+
+        if (in_array($function->getKey(), ['*', '/']) && $first->getRight() !== null) {
+            $node = TreeNode::newNode($first->getRight(), $function, $second);
+            $first->setRight($node);
+            $node = $first;
+        } else {
+            $node = TreeNode::newNode($first, $function, $second);
+        }
+
+        return $this->treeNodes['nodeKey' . count($this->treeNodes)] = $node;
     }
 }
