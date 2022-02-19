@@ -1,0 +1,25 @@
+{
+    "name": "carriongrow/formula_parser",
+    "description": "Package of uploads",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anatoliy Snegovskiy",
+            "email": "CarrionGrow@Gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "ext-json": "*",
+        "james-heinrich/getid3": "^1.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "autoload": {
+        "psr-4": {"CarrionGrow\\FormulaParser\\": "src/"},
+        "exclude-from-classmap": ["/test/"]
+    },
+    "minimum-stability": "dev"
+}
