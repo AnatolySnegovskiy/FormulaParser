@@ -13,6 +13,7 @@ class FormulaParser
 
     public function setFormula(string $formula)
     {
+        var_dump($formula);
         $this->parseFormula($formula);
     }
 
@@ -24,7 +25,25 @@ class FormulaParser
 
     private function parseFormula(string $formula): string
     {
-        var_dump($formula);
+        preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
+        $functionNumberList = $result[0];
+        $functionList = $result[1];
+
+        foreach ($functionList as $key => $item) {
+            $formulaInFunction = trim(str_replace($item, '', $functionNumberList[$key]), '()');
+            $minus = false;
+
+            if (strpos($formulaInFunction, '-') !==false) {
+                $minus = true;
+            }
+
+            $number = $this->treeNodes[$this->parseFormula($formulaInFunction)];
+            $keyNode = 'function_' . $item . '_' . $key;
+            $this->treeNodes[$keyNode] = TreeNode::newNode($number, FunctionFactory::make($item), TreeNode::newNumber($minus ? -1 : 1));
+
+            $formula = str_replace($functionNumberList[$key], $keyNode, $formula);
+        }
+
         preg_match_all('/([^a-z]|^)(\((.+?)?\)+)/ui', $formula, $result);
         $result = $result[2];
 
@@ -36,13 +55,14 @@ class FormulaParser
         $numericList = [];
         $numeric = '';
         $charList = str_split($formula);
+        $firstItem = true;
 
         while (($char = array_shift($charList)) != null) {
-            if (preg_match('/[a-z\.0-9]/ui', $char)) {
+            if (((isset($function) || $firstItem) && $char == '-') || preg_match('/[a-z\.0-9\_]/ui', $char)) {
                 $numeric .= $char;
             }
 
-            if (empty($charList) || $char == ' ' && !empty($numeric)) {
+            if ((empty($charList) || in_array($char, [' ', '+', '-', '*', '/'])) && !empty($numeric) && $numeric != '-') {
                 $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
 
                 if (!isset($this->treeNodes[$keyNumber])) {
@@ -55,9 +75,12 @@ class FormulaParser
 
             if (count($numericList) % 2 == 0 && !empty($function)) {
                 $numericList[] = $this->makeTree($numericList, $function);
-            } elseif (isset(FunctionFactory::$map[$char])) {
-                $function = FunctionFactory::factory($char);
+                unset($function);
+            } elseif (isset(FunctionFactory::$map[$char]) && empty($function) && !$firstItem) {
+                $function = FunctionFactory::make($char);
             }
+
+            $firstItem = false;
         }
 
         return array_keys($this->treeNodes)[count($this->treeNodes) - 1];

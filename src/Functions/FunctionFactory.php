@@ -10,13 +10,14 @@ class FunctionFactory
             '/' => Divide::class,
             '+' => Add::class,
             '-' => Subtract::class,
+            'cos' => Cos::class
         ];
 
     /**
      * @param string $function
      * @return FunctionInterface
      */
-    public static function factory(string $function): FunctionInterface
+    public static function make(string $function): FunctionInterface
     {
         return new self::$map[$function]($function);
     }
