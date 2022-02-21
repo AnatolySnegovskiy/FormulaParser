@@ -9,10 +9,14 @@ class FormulaParserTest extends TestCase
     public function testParseAndCulculate()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('');
-        $parser->setVariables(['test1' => 2, 'test2' => 3]);
-        var_dump($parser->calculate());
-        $parser->setVariables(['test1' => 10, 'test2' => 2]);
-        var_dump($parser->calculate());
+        $parser->setFormula('test1 * test2');
+
+        $counter = 2;
+
+        while ($counter != 0) {
+            $parser->setVariables(['test1' => 2, 'test2' => 1]);
+            $parser->calculate();
+            $counter--;
+        }
     }
 }

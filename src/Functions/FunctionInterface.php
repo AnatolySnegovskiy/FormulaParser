@@ -4,6 +4,6 @@ namespace CarrionGrow\FormulaParser\Functions;
 
 interface FunctionInterface
 {
-    public function calculate($left, $right);
+    public function calculate(float $left, float $right): float;
     public function getKey();
 }

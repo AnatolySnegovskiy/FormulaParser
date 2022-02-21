@@ -31,7 +31,7 @@ class FormulaParser
     {
         foreach ($variables as $key => $variable) {
             if (isset($this->treeNodes[$key])) {
-                $this->treeNodes[$key]->setResult($variable);
+                $this->treeNodes[$key]->result = $variable;
             }
         }
     }

@@ -10,7 +10,7 @@ class TreeNode
     private $function;
     private $right;
     private $left;
-    private $result = 0;
+    public $result = 0;
 
 #region getter_setter
     /**
@@ -67,10 +67,9 @@ class TreeNode
         return $this;
     }
 
-    public function setResult($result): self
+    public function setResult($result)
     {
         $this->result = $result;
-        return $this;
     }
 #endregion
 
@@ -84,7 +83,10 @@ class TreeNode
 
     public static function newNumber($number): self
     {
-        return (new TreeNode())->setResult($number);
+        $node = new TreeNode();
+        $node->setResult($number);
+
+        return $node;
     }
 
     /**
@@ -104,6 +106,6 @@ class TreeNode
             $this->result = $this->function->calculate($this->left->getResult(), $this->right->getResult());
         }
 
-        return (float)$this->result ?? 0;
+        return $this->result;
     }
 }
