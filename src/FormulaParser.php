@@ -9,12 +9,13 @@ class FormulaParser
 {
     /** @var TreeNode[] */
     private $treeNodes = [];
-    /** @var array */
-    private $calculatedTree;
+    /** @var TreeNode */
+    private $lastNode;
 
     /**
      * @param string $formula
      * @return void
+     * @throws \Exception
      */
     public function setFormula(string $formula)
     {
@@ -27,11 +28,9 @@ class FormulaParser
      */
     public function setVariables(array $variables)
     {
-        $this->calculatedTree = $this->treeNodes;
-
         foreach ($variables as $key => $variable) {
-            if (isset($this->calculatedTree[$key])) {
-                $this->calculatedTree[$key]->setResult($variable);
+            if (isset($this->treeNodes[$key])) {
+                $this->treeNodes[$key]->setResult($variable);
             }
         }
     }
@@ -41,21 +40,24 @@ class FormulaParser
      */
     public function calculate()
     {
-        $lastNode = array_pop($this->calculatedTree);
-
-        if (empty($lastNode)) {
-            return 0;
+        if (empty($this->lastNode)) {
+            $this->lastNode = $this->treeNodes[$this->getLastKey()];
         }
 
-        return $lastNode->getResult();
+        return $this->lastNode->getResult();
     }
 
     /**
      * @param string $formula
      * @return string
+     * @throws \Exception
      */
     private function parseFormula(string $formula): string
     {
+        if (empty($formula)) {
+            throw new \Exception('Empty Formula');
+        }
+
         preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
         $functionNumberList = $result[0];
         $functionList = $result[1];
@@ -118,7 +120,7 @@ class FormulaParser
             $firstItem = false;
         }
 
-        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+        return $this->getLastKey();
     }
 
     /**
@@ -140,5 +142,13 @@ class FormulaParser
         }
 
         return $this->treeNodes['nodeKey' . count($this->treeNodes)] = $node;
+    }
+
+    /**
+     * @return int|string
+     */
+    private function getLastKey()
+    {
+        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
     }
 }
