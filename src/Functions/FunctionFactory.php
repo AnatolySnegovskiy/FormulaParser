@@ -10,7 +10,13 @@ class FunctionFactory
             '/' => Divide::class,
             '+' => Add::class,
             '-' => Subtract::class,
-            'cos' => Cos::class
+            'cos' => Cos::class,
+            'sin' => Sin::class,
+            'exp' => Exp::class,
+            'abs' => Abs::class,
+            'log' => Log::class,
+            'sqrt' => Sqrt::class,
+            'tan' => Tan::class,
         ];
 
     /**

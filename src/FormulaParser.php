@@ -10,19 +10,40 @@ class FormulaParser
     /** @var TreeNode[] */
     private $treeNodes = [];
 
-
+    /**
+     * @param string $formula
+     * @return void
+     */
     public function setFormula(string $formula)
     {
-        var_dump($formula);
         $this->parseFormula($formula);
     }
 
-    public function calculate()
+    /**
+     * @param array $variables
+     * @return void
+     */
+    public function setVariables(array $variables)
     {
-        $a = array_pop($this->treeNodes)->getResult();
-        return $a;
+        foreach ($variables as $key => $variable) {
+            if (isset($this->treeNodes[$key])) {
+                $this->treeNodes[$key]->setResult($variable);
+            }
+        }
     }
 
+    /**
+     * @return mixed
+     */
+    public function calculate()
+    {
+        return array_pop($this->treeNodes)->getResult();
+    }
+
+    /**
+     * @param string $formula
+     * @return string
+     */
     private function parseFormula(string $formula): string
     {
         preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
@@ -63,6 +84,10 @@ class FormulaParser
             }
 
             if ((empty($charList) || in_array($char, [' ', '+', '-', '*', '/'])) && !empty($numeric) && $numeric != '-') {
+                if (strpos($numeric, 'pi') !== false) {
+                    $numeric = str_replace('pi', M_PI, $numeric);
+                }
+
                 $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
 
                 if (!isset($this->treeNodes[$keyNumber])) {

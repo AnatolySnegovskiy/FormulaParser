@@ -9,7 +9,8 @@ class FormulaParserTest extends TestCase
     public function testParseAndCulculate()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('-10 * -2 * (45 - 24) + 10 * -cos(10) * (20 + 28) + (1 * 5) * 19 + 2 * 10 / 1.76 * 5 / -4 * cos(10)');
+        $parser->setFormula('test1 * test2');
+        $parser->setVariables(['test1' => 2, 'test2' => 3]);
         var_dump($parser->calculate());
     }
 }
