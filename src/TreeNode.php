@@ -98,12 +98,12 @@ class TreeNode
         return new TreeNode($left, $function, $right);
     }
 
-    public function getResult()
+    public function getResult(): float
     {
         if (!empty($this->function)) {
             $this->result = $this->function->calculate($this->left->getResult(), $this->right->getResult());
         }
 
-        return $this->result;
+        return $this->result ?? 0;
     }
 }

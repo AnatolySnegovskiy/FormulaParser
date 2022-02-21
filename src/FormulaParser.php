@@ -37,7 +37,13 @@ class FormulaParser
      */
     public function calculate()
     {
-        return array_pop($this->treeNodes)->getResult();
+        $lastNode = array_pop($this->treeNodes);
+
+        if (empty($lastNode)) {
+            return 0;
+        }
+
+        return $lastNode->getResult();
     }
 
     /**
