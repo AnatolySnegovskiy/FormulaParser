@@ -1,6 +1,6 @@
 {
     "name": "carriongrow/formula_parser",
-    "description": "Package of uploads",
+    "description": "Formula parser",
     "type": "library",
     "license": "MIT",
     "authors": [
