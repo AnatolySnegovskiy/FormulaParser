@@ -101,8 +101,6 @@ class TreeNode
     public function getResult(): float
     {
         if (!empty($this->function)) {
-            var_dump($this->left->getResult());
-            var_dump($this->right->getResult());
             $this->result = $this->function->calculate($this->left->getResult(), $this->right->getResult());
         }
 
