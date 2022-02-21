@@ -20,6 +20,7 @@ class FormulaParser
     public function setFormula(string $formula)
     {
         $this->parseFormula($formula);
+        $this->lastNode = $this->treeNodes[$this->getLastKey()];
     }
 
     /**
@@ -40,10 +41,6 @@ class FormulaParser
      */
     public function calculate()
     {
-        if (empty($this->lastNode)) {
-            $this->lastNode = $this->treeNodes[$this->getLastKey()];
-        }
-
         return $this->lastNode->getResult();
     }
 
