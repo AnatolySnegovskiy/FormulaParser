@@ -104,6 +104,6 @@ class TreeNode
             $this->result = $this->function->calculate($this->left->getResult(), $this->right->getResult());
         }
 
-        return $this->result ?? 0;
+        return (float)$this->result ?? 0;
     }
 }
