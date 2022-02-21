@@ -9,6 +9,8 @@ class FormulaParser
 {
     /** @var TreeNode[] */
     private $treeNodes = [];
+    /** @var array */
+    private $calculatedTree;
 
     /**
      * @param string $formula
@@ -25,9 +27,11 @@ class FormulaParser
      */
     public function setVariables(array $variables)
     {
+        $this->calculatedTree = $this->treeNodes;
+
         foreach ($variables as $key => $variable) {
-            if (isset($this->treeNodes[$key])) {
-                $this->treeNodes[$key]->setResult($variable);
+            if (isset($this->calculatedTree[$key])) {
+                $this->calculatedTree[$key]->setResult($variable);
             }
         }
     }
@@ -37,7 +41,7 @@ class FormulaParser
      */
     public function calculate()
     {
-        $lastNode = array_pop($this->treeNodes);
+        $lastNode = array_pop($this->calculatedTree);
 
         if (empty($lastNode)) {
             return 0;
@@ -60,7 +64,7 @@ class FormulaParser
             $formulaInFunction = trim(str_replace($item, '', $functionNumberList[$key]), '()');
             $minus = false;
 
-            if (strpos($formulaInFunction, '-') !==false) {
+            if (strpos($formulaInFunction, '-') !== false) {
                 $minus = true;
             }
 
