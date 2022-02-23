@@ -4,6 +4,7 @@ namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Functions\FunctionFactory;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
+use Exception;
 
 class FormulaParser
 {
@@ -15,7 +16,7 @@ class FormulaParser
     /**
      * @param string $formula
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function setFormula(string $formula)
     {
@@ -47,45 +48,22 @@ class FormulaParser
     /**
      * @param string $formula
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     private function parseFormula(string $formula): string
     {
         if (empty($formula)) {
-            throw new \Exception('Empty Formula');
+            throw new Exception('Empty Formula');
         }
 
-        preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
-        $functionNumberList = $result[0];
-        $functionList = $result[1];
-
-        foreach ($functionList as $key => $item) {
-            $formulaInFunction = trim(str_replace($item, '', $functionNumberList[$key]), '()');
-            $minus = false;
-
-            if (strpos($formulaInFunction, '-') !== false) {
-                $minus = true;
-            }
-
-            $number = $this->treeNodes[$this->parseFormula($formulaInFunction)];
-            $keyNode = 'function_' . $item . '_' . $key;
-            $this->treeNodes[$keyNode] = TreeNode::newNode($number, FunctionFactory::make($item), TreeNode::newNumber($minus ? -1 : 1));
-
-            $formula = str_replace($functionNumberList[$key], $keyNode, $formula);
-        }
-
-        preg_match_all('/([^a-z]|^)(\((.+?)?\)+)/ui', $formula, $result);
-        $result = $result[2];
-
-        foreach ($result as $item) {
-            $formula = str_replace($item, $this->parseFormula(trim($item, '()')), $formula);
-        }
+        $formula = $this->functionParsing($formula);
+        $formula = $this->bracketsParsing($formula);
 
         /** @var TreeNode[] $numericList */
         $numericList = [];
         $numeric = '';
-        $charList = str_split($formula);
         $firstItem = true;
+        $charList = str_split($formula);
 
         while (($char = array_shift($charList)) != null) {
             if (((isset($function) || $firstItem) && $char == '-') || preg_match('/[a-z\.0-9\_]/ui', $char)) {
@@ -147,5 +125,51 @@ class FormulaParser
     private function getLastKey()
     {
         return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+    }
+
+    /**
+     * @param string $formula
+     * @return string
+     * @throws Exception
+     */
+    private function functionParsing(string $formula): string
+    {
+        preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
+        $functionNumberList = $result[0];
+        $functionList = $result[1];
+
+        foreach ($functionList as $key => $item) {
+            $formulaInFunction = trim(str_replace($item, '', $functionNumberList[$key]), '()');
+            $minus = false;
+
+            if (strpos($formulaInFunction, '-') !== false) {
+                $minus = true;
+            }
+
+            $number = $this->treeNodes[$this->parseFormula($formulaInFunction)];
+            $keyNode = 'function_' . $item . '_' . $key;
+            $this->treeNodes[$keyNode] = TreeNode::newNode($number, FunctionFactory::make($item), TreeNode::newNumber($minus ? -1 : 1));
+
+            $formula = str_replace($functionNumberList[$key], $keyNode, $formula);
+        }
+
+        return $formula;
+    }
+
+    /**
+     * @param string $formula
+     * @return string
+     * @throws Exception
+     */
+    private function bracketsParsing(string $formula): string
+    {
+        preg_match_all('/([^a-z]|^)(\((.+?)?\)+)/ui', $formula, $result);
+        $result = $result[2];
+
+        foreach ($result as $item) {
+            $formula = str_replace($item, $this->parseFormula(trim($item, '()')), $formula);
+        }
+
+        return $formula;
     }
 }
