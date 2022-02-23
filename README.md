@@ -1,4 +1,4 @@
-# Furmula Parser
+# Formula Parser
 
 Parses formulas, with the possibility of a deferred solution with substitution of user variables
 
