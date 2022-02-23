@@ -1,6 +1,6 @@
 {
     "name": "carriongrow/formula_parser",
-    "description": "Formula parser",
+    "description": "Parses formulas, with the possibility of a deferred solution with substitution of user variables",
     "type": "library",
     "license": "MIT",
     "authors": [

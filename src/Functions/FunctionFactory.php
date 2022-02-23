@@ -10,6 +10,7 @@ class FunctionFactory
             '/' => Divide::class,
             '+' => Add::class,
             '-' => Subtract::class,
+            '^' => Degree::class,
             'cos' => Cos::class,
             'sin' => Sin::class,
             'exp' => Exp::class,

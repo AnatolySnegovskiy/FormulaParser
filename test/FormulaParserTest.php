@@ -91,7 +91,7 @@ class FormulaParserTest extends TestCase
     public function testParseAndCalculateFullInAll()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('(test1 + test2) + sin(test1) - cos(test2) * (cos(test2) - tan(test3) * test4) - (test2 + test3 / test4 * test1 - test2) + tan(test3) / exp(test4) + abs(test5) - log(test6) * sqrt(test7)');
+        $parser->setFormula('(test1 ^ test2) + sin(test1) - cos(test2) * (cos(test2) - tan(test3) * test4) - (test2 + test3 / test4 * test1 - test2) + tan(test3) / exp(test4) + abs(test5) - log(test6) * sqrt(test7)');
         $counter = 1000;
 
         while ($counter != 0) {
@@ -105,7 +105,7 @@ class FormulaParserTest extends TestCase
 
             $parser->setVariables(['test1' => $test1, 'test2' => $test2, 'test3' => $test3, 'test4' => $test4, 'test5' => $test5, 'test6' => $test6, 'test7' => $test7]);
             $this->assertEquals($parser->calculate(),
-                (($test1 + $test2) + sin(deg2rad($test1)) - cos(deg2rad($test2)) * (cos(deg2rad($test2)) - tan(deg2rad($test3)) * $test4) - ($test2 + $test3 / $test4 * $test1 - $test2) + tan(deg2rad($test3)) / exp($test4) + abs($test5) - log($test6) * sqrt($test7))
+                (($test1 ** $test2) + sin(deg2rad($test1)) - cos(deg2rad($test2)) * (cos(deg2rad($test2)) - tan(deg2rad($test3)) * $test4) - ($test2 + $test3 / $test4 * $test1 - $test2) + tan(deg2rad($test3)) / exp($test4) + abs($test5) - log($test6) * sqrt($test7))
             );
             $counter--;
         }
