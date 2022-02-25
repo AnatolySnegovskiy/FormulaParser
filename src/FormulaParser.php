@@ -10,6 +10,9 @@ class FormulaParser
 {
     /** @var TreeNode[] */
     private $treeNodes = [];
+    /** @var TreeNode[] */
+    private $variableNodes = [];
+
     /** @var TreeNode */
     private $lastNode;
 
@@ -35,9 +38,9 @@ class FormulaParser
      */
     public function setVariables(array $variables)
     {
-        foreach ($variables as $key => $variable) {
-            if (isset($this->treeNodes[$key])) {
-                $this->treeNodes[$key]->result = $variable;
+        foreach ($this->variableNodes as $key => $variable) {
+            if (isset($variables[$key])) {
+                $variable->result = $variables[$key];
             }
         }
     }
@@ -84,6 +87,10 @@ class FormulaParser
 
                 if (!isset($this->treeNodes[$keyNumber])) {
                     $this->treeNodes[$keyNumber] = TreeNode::newNumber($numeric);
+
+                    if (!is_numeric($numeric)) {
+                        $this->variableNodes[$keyNumber] = $this->treeNodes[$keyNumber];
+                    }
                 }
 
                 $numericList[] = $this->treeNodes[$keyNumber];

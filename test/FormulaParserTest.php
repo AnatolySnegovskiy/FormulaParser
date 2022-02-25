@@ -10,12 +10,12 @@ class FormulaParserTest extends TestCase
     {
         $parser = new FormulaParser();
         $parser->setFormula('test1 * test2');
-        $counter = 1000;
+        $counter = 1000000;
 
         while ($counter != 0) {
             $first = rand(1, getrandmax()) / getrandmax();
             $second = rand(1, getrandmax()) / getrandmax();
-            $parser->setVariables(['test1' => $first, 'test2' => $second]);
+            $parser->setVariables(['test1' => $first, 'test2' => $second, 'test4' => $first, 'test6' => $second, 'test11' => $first, 'test24' => $second]);
             $this->assertEquals($parser->calculate(), $first * $second);
             $counter--;
         }
