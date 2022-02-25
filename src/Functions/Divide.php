@@ -2,6 +2,8 @@
 
 namespace CarrionGrow\FormulaParser\Functions;
 
+use CarrionGrow\FormulaParser\Config;
+
 class Divide extends FunctionAbstract
 {
     /**
@@ -9,7 +11,11 @@ class Divide extends FunctionAbstract
      */
     public function calculate(float $left, float $right): float
     {
-        if ($right == 0) {
+        if (empty($right) && Config::getInstance()->isSkipError()) {
+            return 0;
+        }
+
+        if (empty($right)) {
             throw new \Exception('Divide by zero');
         }
 

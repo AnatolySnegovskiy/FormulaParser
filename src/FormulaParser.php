@@ -13,6 +13,11 @@ class FormulaParser
     /** @var TreeNode */
     private $lastNode;
 
+    public function getConfig(): Config
+    {
+        return Config::getInstance();
+    }
+
     /**
      * @param string $formula
      * @return void

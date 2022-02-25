@@ -8,8 +8,11 @@ class TreeNode
 {
     /** @var FunctionInterface */
     private $function;
+    /** @var TreeNode|null  */
     private $right;
+    /** @var TreeNode|null  */
     private $left;
+
     public $result = 0;
 
 #region getter_setter
@@ -67,6 +70,10 @@ class TreeNode
         return $this;
     }
 
+    /**
+     * @param $result
+     * @return void
+     */
     public function setResult($result)
     {
         $this->result = $result;
