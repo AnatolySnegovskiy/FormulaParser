@@ -65,7 +65,7 @@ class FormulaParser
      */
     private function parseFormula(string $formula): string
     {
-        if (empty($formula)) {
+        if ($formula === '') {
             throw new Exception('Empty Formula');
         }
 
@@ -118,7 +118,7 @@ class FormulaParser
             $firstItem = false;
         }
 
-        return $this->getLastKey();
+        return (string) $this->getLastKey();
     }
 
     /**
@@ -147,10 +147,18 @@ class FormulaParser
 
     /**
      * @return int|string
+     * @throws Exception
      */
     private function getLastKey()
     {
-        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+        $keys = array_keys($this->treeNodes);
+        $lastKey = end($keys);
+
+        if ($lastKey === false) {
+            throw new Exception('Tree is empty');
+        }
+
+        return $lastKey;
     }
 
     /**
@@ -167,7 +175,13 @@ class FormulaParser
             $hasLeadingMinus = strpos($full, '-' . $name) === 0;
             $argument = trim(str_replace(['-' . $name, $name], '', $full), '()');
 
-            $node = $this->treeNodes[$this->parseFormula($argument)];
+            $key = $this->parseFormula($argument);
+
+            if (!isset($this->treeNodes[$key])) {
+                throw new Exception('Unable to parse function argument');
+            }
+
+            $node = $this->treeNodes[$key];
             $keyNode = 'function_' . $name . '_' . $index;
             $this->treeNodes[$keyNode] = TreeNode::newNode(
                 $node,
@@ -190,7 +204,7 @@ class FormulaParser
         $result = $result[2];
 
         foreach ($result as $item) {
-            $formula = str_replace($item, $this->parseFormula(trim($item, '()')), $formula);
+            $formula = str_replace($item, (string) $this->parseFormula(trim($item, '()')), $formula);
         }
 
         return $formula;

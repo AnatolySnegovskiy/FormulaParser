@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser\Functions;
 
+use Exception;
+
 class FunctionFactory
 {
     /**
-     * @var array<string, string>
+     * @var array<string, class-string<FunctionInterface>>
      */
     public static $map = [
         '*'   => Multiply::class,
@@ -24,8 +26,17 @@ class FunctionFactory
         'tan' => Tan::class,
     ];
 
+    /**
+     * @throws Exception
+     */
     public static function make(string $function): FunctionInterface
     {
-        return new self::$map[$function]($function);
+        if (!isset(self::$map[$function])) {
+            throw new Exception('Unknown function: ' . $function);
+        }
+
+        $class = self::$map[$function];
+
+        return new $class($function);
     }
 }
