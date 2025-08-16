@@ -9,9 +9,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for the TreeNode class.
- */
-class TreeNodeTest extends TestCase
+ * Unit tests for the ExpressionNode class.
+*/
+class ExpressionNodeTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -19,11 +19,11 @@ class TreeNodeTest extends TestCase
     }
 
     /**
-     * Verify that a numeric node created via newNumber keeps the provided value.
+     * Verify that a numeric node created via createFromNumber keeps the provided value.
      */
     public function testNewNumberHoldsResult(): void
     {
-        $node = TreeNode::newNumber(10);
+        $node = ExpressionNode::createFromNumber(10);
         $this->assertSame(10.0, $node->getResult());
     }
 
@@ -32,8 +32,8 @@ class TreeNodeTest extends TestCase
      */
     public function testGetResultUsesFunction(): void
     {
-        $left = TreeNode::newNumber(2);
-        $right = TreeNode::newNumber(3);
+        $left = ExpressionNode::createFromNumber(2);
+        $right = ExpressionNode::createFromNumber(3);
 
         $function = Mockery::mock(FunctionInterface::class);
         $function->shouldReceive('calculate')
@@ -41,7 +41,7 @@ class TreeNodeTest extends TestCase
             ->with(2.0, 3.0)
             ->andReturn(5.0);
 
-        $node = TreeNode::newNode($left, $function, $right);
+        $node = ExpressionNode::createFromOperands($left, $function, $right);
 
         $this->assertSame(5.0, $node->getResult());
     }
@@ -51,23 +51,23 @@ class TreeNodeTest extends TestCase
      */
     public function testGettersAndSetters(): void
     {
-        $left = TreeNode::newNumber(1);
-        $right = TreeNode::newNumber(2);
+        $left = ExpressionNode::createFromNumber(1);
+        $right = ExpressionNode::createFromNumber(2);
         $function = Mockery::mock(FunctionInterface::class);
         $function->shouldReceive('calculate')
             ->once()
             ->with(1.0, 2.0)
             ->andReturn(3.0);
 
-        $node = new TreeNode();
-        $node->setLeft($left)
-            ->setRight($right)
-            ->setFunction($function)
+        $node = new ExpressionNode();
+        $node->setLeftNode($left)
+            ->setRightNode($right)
+            ->setOperation($function)
             ->setResult(3);
 
-        $this->assertSame($left, $node->getLeft());
-        $this->assertSame($right, $node->getRight());
-        $this->assertSame($function, $node->getFunction());
+        $this->assertSame($left, $node->getLeftNode());
+        $this->assertSame($right, $node->getRightNode());
+        $this->assertSame($function, $node->getOperation());
         $this->assertSame(3.0, $node->getResult());
     }
 }

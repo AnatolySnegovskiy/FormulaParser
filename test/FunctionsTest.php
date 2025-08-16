@@ -11,8 +11,7 @@ use CarrionGrow\FormulaParser\Functions\{
     Degree,
     Divide,
     Exp,
-    FunctionFactory,
-    FunctionInterface,
+    FunctionRegistry,
     Log,
     Multiply,
     Sin,
@@ -26,10 +25,10 @@ class FunctionsTest extends TestCase
 {
     public function testFactoryCreatesCorrectInstances(): void
     {
-        $this->assertInstanceOf(Add::class, FunctionFactory::make('+'));
-        $this->assertInstanceOf(Subtract::class, FunctionFactory::make('-'));
-        $this->assertInstanceOf(Multiply::class, FunctionFactory::make('*'));
-        $this->assertInstanceOf(Divide::class, FunctionFactory::make('/'));
+        $this->assertInstanceOf(Add::class, FunctionRegistry::create('+'));
+        $this->assertInstanceOf(Subtract::class, FunctionRegistry::create('-'));
+        $this->assertInstanceOf(Multiply::class, FunctionRegistry::create('*'));
+        $this->assertInstanceOf(Divide::class, FunctionRegistry::create('/'));
     }
 
     public function testAllFunctionCalculations(): void
@@ -48,10 +47,10 @@ class FunctionsTest extends TestCase
         $this->assertEquals(sqrt(8 * 2), (new Sqrt('sqrt'))->calculate(2, 8));
     }
 
-    public function testFunctionGetKey(): void
+    public function testFunctionGetSymbol(): void
     {
         $add = new Add('+');
-        $this->assertEquals('+', $add->getKey());
+        $this->assertEquals('+', $add->getSymbol());
     }
 
     public function testDivideByZeroThrows(): void

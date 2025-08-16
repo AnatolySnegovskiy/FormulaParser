@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
-class Config
+class ParserConfig
 {
     /**
-     * @var Config|null
+     * @var ParserConfig|null
      */
     private static $instance = null;
 
@@ -20,7 +20,7 @@ class Config
     {
     }
 
-    public static function getInstance(): Config
+    public static function getInstance(): ParserConfig
     {
         return self::$instance ?? self::$instance = new self();
     }

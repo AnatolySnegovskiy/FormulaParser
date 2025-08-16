@@ -7,17 +7,17 @@ namespace CarrionGrow\FormulaParser;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests for the Config singleton.
- */
-class ConfigTest extends TestCase
+ * Tests for the ParserConfig singleton.
+*/
+class ParserConfigTest extends TestCase
 {
     /**
      * getInstance should always return the same object.
      */
     public function testGetInstanceReturnsSameObject(): void
     {
-        $first = Config::getInstance();
-        $second = Config::getInstance();
+        $first = ParserConfig::getInstance();
+        $second = ParserConfig::getInstance();
         $this->assertSame($first, $second);
     }
 
@@ -26,7 +26,7 @@ class ConfigTest extends TestCase
      */
     public function testSetAndGetSkipError(): void
     {
-        $config = Config::getInstance();
+        $config = ParserConfig::getInstance();
         $config->setSkipError(true);
         $this->assertTrue($config->isSkipError());
         // reset to default for other tests

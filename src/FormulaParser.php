@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
-use CarrionGrow\FormulaParser\Functions\FunctionFactory;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 use Exception;
 
 class FormulaParser
 {
     /**
-     * @var TreeNode[]
+     * @var ExpressionNode[]
      */
     private $treeNodes = [];
 
     /**
-     * @var TreeNode[]
+     * @var ExpressionNode[]
      */
     private $variableNodes = [];
 
     /**
-     * @var TreeNode|null
+     * @var ExpressionNode|null
      */
     private $lastNode = null;
 
-    public function getConfig(): Config
+    public function getConfig(): ParserConfig
     {
-        return Config::getInstance();
+        return ParserConfig::getInstance();
     }
 
     /**
@@ -72,7 +72,7 @@ class FormulaParser
         $formula = $this->functionParsing($formula);
         $formula = $this->bracketsParsing($formula);
 
-        /** @var TreeNode[] $numericList */
+        /** @var ExpressionNode[] $numericList */
         $numericList = [];
         $numeric = '';
         $firstItem = true;
@@ -97,7 +97,7 @@ class FormulaParser
                 $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
 
                 if (!isset($this->treeNodes[$keyNumber])) {
-                    $this->treeNodes[$keyNumber] = TreeNode::newNumber((float) $numeric);
+                    $this->treeNodes[$keyNumber] = ExpressionNode::createFromNumber((float) $numeric);
 
                     if (!is_numeric($numeric)) {
                         $this->variableNodes[$keyNumber] = $this->treeNodes[$keyNumber];
@@ -111,21 +111,21 @@ class FormulaParser
             if (count($numericList) % 2 === 0 && $function !== null) {
                 $numericList[] = $this->makeTree($numericList, $function);
                 $function = null;
-            } elseif (isset(FunctionFactory::$map[$char]) && $function === null && !$firstItem) {
-                $function = FunctionFactory::make($char);
+            } elseif (isset(FunctionRegistry::$map[$char]) && $function === null && !$firstItem) {
+                $function = FunctionRegistry::create($char);
             }
 
             $firstItem = false;
         }
 
-        return (string) $this->getLastKey();
+        return $this->getLastKey();
     }
 
     /**
-     * @param TreeNode[]        $numericList
+     * @param ExpressionNode[]        $numericList
      * @param FunctionInterface $function
      */
-    private function makeTree(array $numericList, FunctionInterface $function): TreeNode
+    private function makeTree(array $numericList, FunctionInterface $function): ExpressionNode
     {
         $second = array_pop($numericList);
         $first = array_pop($numericList);
@@ -134,22 +134,24 @@ class FormulaParser
             throw new Exception('Numeric list must contain two operands');
         }
 
-        if (in_array($function->getKey(), ['*', '/'], true) && $first->getRight() !== null) {
-            $node = TreeNode::newNode($first->getRight(), $function, $second);
-            $first->setRight($node);
+        $right = $first->getRightNode();
+
+        if (in_array($function->getSymbol(), ['*', '/'], true) && $right !== null) {
+            $node = ExpressionNode::createFromOperands($right, $function, $second);
+            $first->setRightNode($node);
             $node = $first;
         } else {
-            $node = TreeNode::newNode($first, $function, $second);
+            $node = ExpressionNode::createFromOperands($first, $function, $second);
         }
 
         return $this->treeNodes['nodeKey' . count($this->treeNodes)] = $node;
     }
 
     /**
-     * @return int|string
+     * @return string
      * @throws Exception
      */
-    private function getLastKey()
+    private function getLastKey(): string
     {
         $keys = array_keys($this->treeNodes);
         $lastKey = end($keys);
@@ -158,7 +160,7 @@ class FormulaParser
             throw new Exception('Tree is empty');
         }
 
-        return $lastKey;
+        return (string) $lastKey;
     }
 
     /**
@@ -183,10 +185,10 @@ class FormulaParser
 
             $node = $this->treeNodes[$key];
             $keyNode = 'function_' . $name . '_' . $index;
-            $this->treeNodes[$keyNode] = TreeNode::newNode(
+            $this->treeNodes[$keyNode] = ExpressionNode::createFromOperands(
                 $node,
-                FunctionFactory::make($name),
-                TreeNode::newNumber($hasLeadingMinus ? -1 : 1)
+                FunctionRegistry::create($name),
+                ExpressionNode::createFromNumber($hasLeadingMinus ? -1 : 1)
             );
 
             $formula = str_replace($full, $keyNode, $formula);
@@ -204,7 +206,7 @@ class FormulaParser
         $result = $result[2];
 
         foreach ($result as $item) {
-            $formula = str_replace($item, (string) $this->parseFormula(trim($item, '()')), $formula);
+            $formula = str_replace($item, $this->parseFormula(trim($item, '()')), $formula);
         }
 
         return $formula;

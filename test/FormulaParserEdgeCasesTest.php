@@ -44,7 +44,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->setFormula('a / b');
         $parser->setVariables(['a' => 1, 'b' => 0]);
 
-        $config = Config::getInstance();
+        $config = ParserConfig::getInstance();
         $config->setSkipError(true);
         $this->assertEquals(0.0, $parser->calculate());
 

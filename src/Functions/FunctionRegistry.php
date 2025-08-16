@@ -6,7 +6,7 @@ namespace CarrionGrow\FormulaParser\Functions;
 
 use Exception;
 
-class FunctionFactory
+class FunctionRegistry
 {
     /**
      * @var array<string, class-string<FunctionInterface>>
@@ -29,14 +29,14 @@ class FunctionFactory
     /**
      * @throws Exception
      */
-    public static function make(string $function): FunctionInterface
+    public static function create(string $symbol): FunctionInterface
     {
-        if (!isset(self::$map[$function])) {
-            throw new Exception('Unknown function: ' . $function);
+        if (!isset(self::$map[$symbol])) {
+            throw new Exception('Unknown function: ' . $symbol);
         }
 
-        $class = self::$map[$function];
+        $class = self::$map[$symbol];
 
-        return new $class($function);
+        return new $class($symbol);
     }
 }
