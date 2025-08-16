@@ -8,38 +8,6 @@ use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
 use PHPUnit\Framework\TestCase;
 
-class AlwaysMissingArray implements \ArrayAccess
-{
-    /**
-     * @var array
-     */
-    private $storage = [];
-
-    public function offsetExists($offset): bool
-    {
-        return false;
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->storage[$offset] ?? null;
-    }
-
-    public function offsetSet($offset, $value): void
-    {
-        if ($offset === null) {
-            $this->storage[] = $value;
-        } else {
-            $this->storage[$offset] = $value;
-        }
-    }
-
-    public function offsetUnset($offset): void
-    {
-        unset($this->storage[$offset]);
-    }
-}
-
 class FormulaParserEdgeCasesTest extends TestCase
 {
     public function testCalculateWithoutSettingFormulaThrows(): void
