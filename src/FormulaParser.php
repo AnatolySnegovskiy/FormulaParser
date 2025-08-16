@@ -7,16 +7,17 @@ namespace CarrionGrow\FormulaParser;
 use CarrionGrow\FormulaParser\Functions\FunctionFactory;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 use Exception;
+use LogicException;
 
 class FormulaParser
 {
     /**
-     * @var TreeNode[]
+     * @var array<string, TreeNode>
      */
     private $treeNodes = [];
 
     /**
-     * @var TreeNode[]
+     * @var array<string, TreeNode>
      */
     private $variableNodes = [];
 
@@ -39,6 +40,9 @@ class FormulaParser
         $this->lastNode = $this->treeNodes[$this->getLastKey()];
     }
 
+    /**
+     * @param array<string, float> $variables
+     */
     public function setVariables(array $variables): void
     {
         foreach ($this->variableNodes as $key => $variable) {
@@ -140,11 +144,16 @@ class FormulaParser
     }
 
     /**
-     * @return int|string
+     * @return string
      */
-    private function getLastKey()
+    private function getLastKey(): string
     {
-        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+        $key = array_key_last($this->treeNodes);
+        if ($key === null) {
+            throw new LogicException('No tree nodes available');
+        }
+
+        return (string) $key;
     }
 
     /**
