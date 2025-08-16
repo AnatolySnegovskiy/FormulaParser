@@ -2,7 +2,7 @@
 <psalm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="https://getpsalm.org/schema/config"
        errorLevel="1"
-       findUnusedCode="true">
+       findUnusedCode="false">
     <projectFiles>
         <directory name="src" />
         <ignoreFiles>

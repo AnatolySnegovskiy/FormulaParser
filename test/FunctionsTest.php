@@ -2,34 +2,32 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
-use CarrionGrow\FormulaParser\Functions\{
-    Abs,
-    Add,
-    Cos,
-    Degree,
-    Divide,
-    Exp,
-    FunctionFactory,
-    FunctionInterface,
-    Log,
-    Multiply,
-    Sin,
-    Sqrt,
-    Subtract,
-    Tan
-};
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
+use CarrionGrow\FormulaParser\Functions\Abs;
+use CarrionGrow\FormulaParser\Functions\Add;
+use CarrionGrow\FormulaParser\Functions\Cos;
+use CarrionGrow\FormulaParser\Functions\Degree;
+use CarrionGrow\FormulaParser\Functions\Divide;
+use CarrionGrow\FormulaParser\Functions\Exp;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
+use CarrionGrow\FormulaParser\Functions\Log;
+use CarrionGrow\FormulaParser\Functions\Multiply;
+use CarrionGrow\FormulaParser\Functions\Sin;
+use CarrionGrow\FormulaParser\Functions\Sqrt;
+use CarrionGrow\FormulaParser\Functions\Subtract;
+use CarrionGrow\FormulaParser\Functions\Tan;
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
 {
     public function testFactoryCreatesCorrectInstances(): void
     {
-        $this->assertInstanceOf(Add::class, FunctionFactory::make('+'));
-        $this->assertInstanceOf(Subtract::class, FunctionFactory::make('-'));
-        $this->assertInstanceOf(Multiply::class, FunctionFactory::make('*'));
-        $this->assertInstanceOf(Divide::class, FunctionFactory::make('/'));
+        $this->assertInstanceOf(Add::class, FunctionRegistry::create('+'));
+        $this->assertInstanceOf(Subtract::class, FunctionRegistry::create('-'));
+        $this->assertInstanceOf(Multiply::class, FunctionRegistry::create('*'));
+        $this->assertInstanceOf(Divide::class, FunctionRegistry::create('/'));
     }
 
     public function testAllFunctionCalculations(): void
@@ -48,15 +46,21 @@ class FunctionsTest extends TestCase
         $this->assertEquals(sqrt(8 * 2), (new Sqrt('sqrt'))->calculate(2, 8));
     }
 
-    public function testFunctionGetKey(): void
+    public function testFunctionGetSymbol(): void
     {
         $add = new Add('+');
-        $this->assertEquals('+', $add->getKey());
+        $this->assertEquals('+', $add->getSymbol());
     }
 
     public function testDivideByZeroThrows(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         (new Divide('/'))->calculate(1, 0);
+    }
+
+    public function testCreateUnknownFunctionThrowsException(): void
+    {
+        $this->expectException(FormulaParserException::class);
+        FunctionRegistry::create('%');
     }
 }

@@ -8,5 +8,5 @@ interface FunctionInterface
 {
     public function calculate(float $left, float $right): float;
 
-    public function getKey(): string;
+    public function getSymbol(): string;
 }

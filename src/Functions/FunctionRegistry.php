@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser\Functions;
 
-class FunctionFactory
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
+
+class FunctionRegistry
 {
     /**
-     * @var array<string, string>
+     * @var array<string, class-string<FunctionInterface>>
      */
     public static $map = [
         '*'   => Multiply::class,
@@ -24,8 +26,17 @@ class FunctionFactory
         'tan' => Tan::class,
     ];
 
-    public static function make(string $function): FunctionInterface
+    /**
+     * @throws FormulaParserException
+     */
+    public static function create(string $symbol): FunctionInterface
     {
-        return new self::$map[$function]($function);
+        if (!isset(self::$map[$symbol])) {
+            throw new FormulaParserException('Unknown function: ' . $symbol);
+        }
+
+        $class = self::$map[$symbol];
+
+        return new $class($symbol);
     }
 }

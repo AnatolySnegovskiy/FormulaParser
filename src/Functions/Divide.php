@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser\Functions;
 
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use CarrionGrow\FormulaParser\Config;
 
-class Divide extends FunctionAbstract
+class Divide extends AbstractFunction
 {
     /**
-     * @throws \Exception
+     * @throws FormulaParserException
      */
     public function calculate(float $left, float $right): float
     {
@@ -18,7 +19,7 @@ class Divide extends FunctionAbstract
         }
 
         if (empty($right)) {
-            throw new \Exception('Divide by zero');
+            throw new FormulaParserException('Divide by zero');
         }
 
         return $left / $right;

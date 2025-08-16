@@ -2,15 +2,28 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
+use CarrionGrow\FormulaParser\Config;
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
+use CarrionGrow\FormulaParser\FormulaParser;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
+use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class FormulaParserEdgeCasesTest extends TestCase
 {
+    public function testCalculateWithoutSettingFormulaThrows(): void
+    {
+        $parser = new FormulaParser();
+        $this->expectException(FormulaParserException::class);
+        $parser->calculate();
+    }
+
     public function testEmptyFormulaThrowsException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         $parser = new FormulaParser();
         $parser->setFormula('');
     }
@@ -43,7 +56,7 @@ class FormulaParserEdgeCasesTest extends TestCase
 
         $config->setSkipError(false);
         $parser->setVariables(['a' => 1, 'b' => 0]);
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         $parser->calculate();
     }
 
@@ -53,5 +66,23 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->setFormula('sin(-5)');
         $parser->setVariables([]);
         $this->assertEquals(sin(deg2rad(-5)), $parser->calculate());
+    }
+
+    public function testMakeTreeThrowsWhenOperandsMissing(): void
+    {
+        $parser = new FormulaParser();
+        $method = new \ReflectionMethod(FormulaParser::class, 'makeTree');
+        $method->setAccessible(true);
+        $this->expectException(FormulaParserException::class);
+        $method->invoke($parser, [], FunctionRegistry::create('+'));
+    }
+
+    public function testGetLastKeyThrowsWhenTreeEmpty(): void
+    {
+        $parser = new FormulaParser();
+        $method = new \ReflectionMethod(FormulaParser::class, 'getLastKey');
+        $method->setAccessible(true);
+        $this->expectException(FormulaParserException::class);
+        $method->invoke($parser);
     }
 }
