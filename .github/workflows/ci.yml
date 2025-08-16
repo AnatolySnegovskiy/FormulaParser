@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+      - run: composer install --prefer-dist --no-progress
+      - run: vendor/bin/phpcs
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+      - run: composer install --prefer-dist --no-progress
+      - run: vendor/bin/psalm
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: xdebug
+          tools: composer:v2
+      - run: composer install --prefer-dist --no-progress
+      - run: XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover=coverage.xml
+      - name: Enforce 100% coverage
+        run: |
+          php -r '$xml=new SimpleXMLElement(file_get_contents("coverage.xml")); $m=$xml->project->metrics; $elements=(int)$m["elements"]; $covered=(int)$m["coveredelements"]; $pct=$elements?($covered/$elements*100):0; $msg=sprintf("Total coverage: %.2f%%", $pct); echo $msg . PHP_EOL; file_put_contents(getenv("GITHUB_STEP_SUMMARY"), $msg . PHP_EOL); if ($covered < $elements) { fwrite(STDERR, "Coverage must be 100%\n"); exit(1); }'
