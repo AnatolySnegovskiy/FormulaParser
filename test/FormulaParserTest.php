@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserTest extends TestCase
 {
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $parser = new FormulaParser();
 
         $this->assertEquals(Config::getInstance(), $parser->getConfig());
     }
 
-    public function testParseAndCalculateMultiply()
+    public function testParseAndCalculateMultiply(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('a * b');
@@ -21,8 +23,7 @@ class FormulaParserTest extends TestCase
         $this->assertEquals(6.0, $parser->calculate());
     }
 
-
-    public function testParseAndCalculateDivide()
+    public function testParseAndCalculateDivide(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('a / b');
@@ -30,7 +31,7 @@ class FormulaParserTest extends TestCase
         $this->assertEquals(5.0, $parser->calculate());
     }
 
-    public function testParseAndCalculateAdd()
+    public function testParseAndCalculateAdd(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('a + b');
@@ -38,7 +39,7 @@ class FormulaParserTest extends TestCase
         $this->assertEquals(9.0, $parser->calculate());
     }
 
-    public function testParseAndCalculateSubtract()
+    public function testParseAndCalculateSubtract(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('a - b');
@@ -46,7 +47,7 @@ class FormulaParserTest extends TestCase
         $this->assertEquals(5.0, $parser->calculate());
     }
 
-    public function testParseAndCalculateFunction()
+    public function testParseAndCalculateFunction(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('sin(a) - cos(b) * tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)');
@@ -58,7 +59,7 @@ class FormulaParserTest extends TestCase
         $this->assertEquals($expected, $parser->calculate());
     }
 
-    public function testParseAndCalculateFullInAll()
+    public function testParseAndCalculateFullInAll(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('(a ^ b) + sin(a) - cos(b) * (cos(b) - tan(c) * d) - (b + c / d * a - b) + tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)');
@@ -69,3 +70,4 @@ class FormulaParserTest extends TestCase
         $this->assertEquals($expected, $parser->calculate());
     }
 }
+

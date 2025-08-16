@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Functions\FunctionFactory;
@@ -8,12 +10,19 @@ use Exception;
 
 class FormulaParser
 {
-    /** @var TreeNode[] */
+    /**
+     * @var TreeNode[]
+     */
     private $treeNodes = [];
-    /** @var TreeNode[] */
+
+    /**
+     * @var TreeNode[]
+     */
     private $variableNodes = [];
 
-    /** @var TreeNode */
+    /**
+     * @var TreeNode
+     */
     private $lastNode;
 
     public function getConfig(): Config
@@ -22,21 +31,15 @@ class FormulaParser
     }
 
     /**
-     * @param string $formula
-     * @return void
      * @throws Exception
      */
-    public function setFormula(string $formula)
+    public function setFormula(string $formula): void
     {
         $this->parseFormula($formula);
         $this->lastNode = $this->treeNodes[$this->getLastKey()];
     }
 
-    /**
-     * @param array $variables
-     * @return void
-     */
-    public function setVariables(array $variables)
+    public function setVariables(array $variables): void
     {
         foreach ($this->variableNodes as $key => $variable) {
             if (isset($variables[$key])) {
@@ -45,17 +48,12 @@ class FormulaParser
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function calculate()
+    public function calculate(): float
     {
         return $this->lastNode->getResult();
     }
 
     /**
-     * @param string $formula
-     * @return string
      * @throws Exception
      */
     private function parseFormula(string $formula): string
@@ -73,12 +71,12 @@ class FormulaParser
         $firstItem = true;
         $charList = str_split($formula);
 
-        while (($char = array_shift($charList)) != null) {
-            if (((isset($function) || $firstItem) && $char == '-') || preg_match('/[a-z\.0-9\_]/ui', $char)) {
+        while (($char = array_shift($charList)) !== null) {
+            if (((isset($function) || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
                 $numeric .= $char;
             }
 
-            if ((empty($charList) || in_array($char, [' ', '+', '-', '*', '/', '^'])) && !empty($numeric) && $numeric != '-') {
+            if ((empty($charList) || in_array($char, [' ', '+', '-', '*', '/', '^'])) && !empty($numeric) && $numeric !== '-') {
                 if (strpos($numeric, 'pi') !== false) {
                     $numeric = str_replace('pi', M_PI, $numeric);
                 }
@@ -86,7 +84,7 @@ class FormulaParser
                 $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
 
                 if (!isset($this->treeNodes[$keyNumber])) {
-                    $this->treeNodes[$keyNumber] = TreeNode::newNumber($numeric);
+                    $this->treeNodes[$keyNumber] = TreeNode::newNumber((float) $numeric);
 
                     if (!is_numeric($numeric)) {
                         $this->variableNodes[$keyNumber] = $this->treeNodes[$keyNumber];
@@ -97,7 +95,7 @@ class FormulaParser
                 $numeric = '';
             }
 
-            if (count($numericList) % 2 == 0 && !empty($function)) {
+            if (count($numericList) % 2 === 0 && !empty($function)) {
                 $numericList[] = $this->makeTree($numericList, $function);
                 unset($function);
             } elseif (isset(FunctionFactory::$map[$char]) && empty($function) && !$firstItem) {
@@ -111,16 +109,15 @@ class FormulaParser
     }
 
     /**
-     * @param TreeNode[] $numericList
+     * @param TreeNode[]        $numericList
      * @param FunctionInterface $function
-     * @return TreeNode
      */
     private function makeTree(array $numericList, FunctionInterface $function): TreeNode
     {
         $second = array_pop($numericList);
         $first = array_pop($numericList);
 
-        if (in_array($function->getKey(), ['*', '/']) && $first->getRight() !== null) {
+        if (in_array($function->getKey(), ['*', '/'], true) && $first->getRight() !== null) {
             $node = TreeNode::newNode($first->getRight(), $function, $second);
             $first->setRight($node);
             $node = $first;
@@ -140,8 +137,6 @@ class FormulaParser
     }
 
     /**
-     * @param string $formula
-     * @return string
      * @throws Exception
      */
     private function functionParsing(string $formula): string
@@ -170,8 +165,6 @@ class FormulaParser
     }
 
     /**
-     * @param string $formula
-     * @return string
      * @throws Exception
      */
     private function bracketsParsing(string $formula): string

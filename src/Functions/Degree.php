@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser\Functions;
 
 class Degree extends FunctionAbstract
