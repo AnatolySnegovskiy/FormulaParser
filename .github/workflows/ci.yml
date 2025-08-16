@@ -4,40 +4,116 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   style:
+    name: Coding style (PHPCS)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.3'
           tools: composer:v2
-      - run: composer install --prefer-dist --no-progress
-      - run: vendor/bin/phpcs
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Install dependencies (with cache)
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: --no-interaction --prefer-dist --no-progress
+
+      - name: PHPCS
+        run: |
+          vendor/bin/phpcs -q --report=full --parallel=4
 
   static-analysis:
+    name: Static analysis (Psalm)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.3'
           tools: composer:v2
-      - run: composer install --prefer-dist --no-progress
-      - run: vendor/bin/psalm
+          coverage: none
+          ini-values: memory_limit=-1
+
+      - name: Install dependencies (with cache)
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: --no-interaction --prefer-dist --no-progress
+
+      - name: Psalm
+        run: |
+          vendor/bin/psalm --output-format=github --no-cache
 
   tests:
+    name: Tests (PHPUnit) on PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.2', '8.3']
+
     steps:
       - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          coverage: xdebug
+          php-version: ${{ matrix.php }}
+          # pcov быстрее xdebug. Для одной версии можно переключить на xdebug, если нужно line-by-line.
+          coverage: pcov
           tools: composer:v2
-      - run: composer install --prefer-dist --no-progress
-      - run: XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover=coverage.xml
-      - name: Enforce 100% coverage
+          ini-values: memory_limit=-1
+
+      - name: Install dependencies (with cache)
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: --no-interaction --prefer-dist --no-progress
+
+      - name: PHPUnit (with coverage)
         run: |
-          php -r '$xml=new SimpleXMLElement(file_get_contents("coverage.xml")); $m=$xml->project->metrics; $elements=(int)$m["elements"]; $covered=(int)$m["coveredelements"]; $pct=$elements?($covered/$elements*100):0; $msg=sprintf("Total coverage: %.2f%%", $pct); echo $msg . PHP_EOL; file_put_contents(getenv("GITHUB_STEP_SUMMARY"), $msg . PHP_EOL); if ($covered < $elements) { fwrite(STDERR, "Coverage must be 100%\n"); exit(1); }'
+          vendor/bin/phpunit \
+            --coverage-clover=coverage.xml \
+            --display-deprecations \
+            --fail-on-deprecation \
+            --fail-on-warning \
+            --fail-on-risky
+
+      - name: Enforce coverage threshold
+        # Порог задаётся через env, по умолчанию 100
+        env:
+          COVERAGE_MIN: "100"
+        run: |
+          php -r '
+          $f = "coverage.xml";
+          if (!file_exists($f)) { fwrite(STDERR, "coverage.xml not found\n"); exit(1); }
+          $xml = new SimpleXMLElement(file_get_contents($f));
+          $m = $xml->project->metrics;
+          $elements = (int)$m["elements"]; $covered = (int)$m["coveredelements"];
+          $pct = $elements ? ($covered/$elements*100) : 0;
+          $min = getenv("COVERAGE_MIN") !== false ? (float)getenv("COVERAGE_MIN") : 100.0;
+          $msg = sprintf("Total coverage: %.2f%% (min: %.2f%%)", $pct, $min);
+          echo $msg . PHP_EOL;
+          file_put_contents(getenv("GITHUB_STEP_SUMMARY") ?: "summary.txt", $msg . PHP_EOL, FILE_APPEND);
+          if ($pct + 1e-9 < $min) { fwrite(STDERR, "Coverage is below threshold\n"); exit(1); }'
+
+      - name: Upload coverage.xml
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.php }}
+          path: coverage.xml
+          if-no-files-found: error
