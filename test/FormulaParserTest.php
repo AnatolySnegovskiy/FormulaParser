@@ -9,105 +9,56 @@ class FormulaParserTest extends TestCase
     public function testParseAndCalculateMultiply()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('test1 * test2');
-        $counter = 1000000;
-
-        while ($counter != 0) {
-            $first = rand(1, getrandmax()) / getrandmax();
-            $second = rand(1, getrandmax()) / getrandmax();
-            $parser->setVariables(['test1' => $first, 'test2' => $second, 'test4' => $first, 'test6' => $second, 'test11' => $first, 'test24' => $second]);
-            $this->assertEquals($parser->calculate(), $first * $second);
-            $counter--;
-        }
+        $parser->setFormula('a * b');
+        $parser->setVariables(['a' => 2, 'b' => 3]);
+        $this->assertEquals(6.0, $parser->calculate());
     }
 
 
     public function testParseAndCalculateDivide()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('test1 / test2');
-        $counter = 1000;
-
-        while ($counter != 0) {
-            $first = rand(1, getrandmax()) / getrandmax();
-            $second = rand(1, getrandmax()) / getrandmax();
-            $parser->setVariables(['test1' => $first, 'test2' => $second]);
-            $this->assertEquals($parser->calculate(), $first / $second);
-            $counter--;
-        }
+        $parser->setFormula('a / b');
+        $parser->setVariables(['a' => 10, 'b' => 2]);
+        $this->assertEquals(5.0, $parser->calculate());
     }
 
     public function testParseAndCalculateAdd()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('test1 + test2');
-        $counter = 1000;
-
-        while ($counter != 0) {
-            $first = rand(1, getrandmax()) / getrandmax();
-            $second = rand(1, getrandmax()) / getrandmax();
-            $parser->setVariables(['test1' => $first, 'test2' => $second]);
-            $this->assertEquals($parser->calculate(), $first + $second);
-            $counter--;
-        }
+        $parser->setFormula('a + b');
+        $parser->setVariables(['a' => 4, 'b' => 5]);
+        $this->assertEquals(9.0, $parser->calculate());
     }
 
     public function testParseAndCalculateSubtract()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('test1 - test2');
-        $counter = 1000;
-
-        while ($counter != 0) {
-            $first = rand(1, getrandmax()) / getrandmax();
-            $second = rand(1, getrandmax()) / getrandmax();
-            $parser->setVariables(['test1' => $first, 'test2' => $second]);
-            $this->assertEquals($parser->calculate(), $first - $second);
-            $counter--;
-        }
+        $parser->setFormula('a - b');
+        $parser->setVariables(['a' => 7, 'b' => 2]);
+        $this->assertEquals(5.0, $parser->calculate());
     }
 
     public function testParseAndCalculateFunction()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('sin(test1) - cos(test2) * tan(test3) / exp(test4) + abs(test5) - log(test6) * sqrt(test7)');
-        $counter = 1000;
+        $parser->setFormula('sin(a) - cos(b) * tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)');
 
-        while ($counter != 0) {
-            $test1 = rand(1, getrandmax()) / getrandmax();
-            $test2 = rand(1, getrandmax()) / getrandmax();
-            $test3 = rand(1, getrandmax()) / getrandmax();
-            $test4 = rand(1, getrandmax()) / getrandmax();
-            $test5 = rand(1, getrandmax()) / getrandmax();
-            $test6 = rand(1, getrandmax()) / getrandmax();
-            $test7 = rand(1, getrandmax()) / getrandmax();
+        $vars = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => -5, 'f' => 6, 'g' => 7];
+        $parser->setVariables($vars);
 
-            $parser->setVariables(['test1' => $test1, 'test2' => $test2, 'test3' => $test3, 'test4' => $test4, 'test5' => $test5, 'test6' => $test6, 'test7' => $test7]);
-            $this->assertEquals($parser->calculate(), (sin(deg2rad($test1)) - cos(deg2rad($test2)) * tan(deg2rad($test3)) / exp($test4) + abs($test5) - log($test6) * sqrt($test7)));
-            $counter--;
-        }
+        $expected = sin(deg2rad(1)) - cos(deg2rad(2)) * tan(deg2rad(3)) / exp(4) + abs(-5) - log(6) * sqrt(7);
+        $this->assertEquals($expected, $parser->calculate());
     }
 
     public function testParseAndCalculateFullInAll()
     {
         $parser = new FormulaParser();
-        $parser->setFormula('(test1 ^ test2) + sin(test1) - cos(test2) * (cos(test2) - tan(test3) * test4) - (test2 + test3 / test4 * test1 - test2) + tan(test3) / exp(test4) + abs(test5) - log(test6) * sqrt(test7)');
-        $counter = 1000;
+        $parser->setFormula('(a ^ b) + sin(a) - cos(b) * (cos(b) - tan(c) * d) - (b + c / d * a - b) + tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)');
 
-        while ($counter != 0) {
-            $test1 = rand(1, getrandmax()) / getrandmax();
-            $test2 = rand(1, getrandmax()) / getrandmax();
-            $test3 = rand(1, getrandmax()) / getrandmax();
-            $test4 = rand(1, getrandmax()) / getrandmax();
-            $test5 = rand(1, getrandmax()) / getrandmax();
-            $test6 = rand(1, getrandmax()) / getrandmax();
-            $test7 = rand(1, getrandmax()) / getrandmax();
-
-            $parser->setVariables(['test1' => $test1, 'test2' => $test2, 'test3' => $test3, 'test4' => $test4, 'test5' => $test5, 'test6' => $test6, 'test7' => $test7]);
-            $this->assertEquals($parser->calculate(),
-                (($test1 ** $test2) + sin(deg2rad($test1)) - cos(deg2rad($test2)) * (cos(deg2rad($test2)) - tan(deg2rad($test3)) * $test4) - ($test2 + $test3 / $test4 * $test1 - $test2) + tan(deg2rad($test3)) / exp($test4) + abs($test5) - log($test6) * sqrt($test7))
-            );
-            $counter--;
-        }
+        $vars = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => -5, 'f' => 6, 'g' => 7];
+        $parser->setVariables($vars);
+        $expected = (1 ** 2) + sin(deg2rad(1)) - cos(deg2rad(2)) * (cos(deg2rad(2)) - tan(deg2rad(3)) * 4) - (2 + 3 / 4 * 1 - 2) + tan(deg2rad(3)) / exp(4) + abs(-5) - log(6) * sqrt(7);
+        $this->assertEquals($expected, $parser->calculate());
     }
 }

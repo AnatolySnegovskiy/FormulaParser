@@ -146,23 +146,24 @@ class FormulaParser
      */
     private function functionParsing(string $formula): string
     {
-        preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $result);
-        $functionNumberList = $result[0];
-        $functionList = $result[1];
+        preg_match_all('/-?(sqrt|abs|sin|cos|tan|log|exp)\(.+?\)/ui', $formula, $matches);
+        $fullMatches = $matches[0];
+        $names = $matches[1];
 
-        foreach ($functionList as $key => $item) {
-            $formulaInFunction = trim(str_replace($item, '', $functionNumberList[$key]), '()');
-            $minus = false;
+        foreach ($names as $index => $name) {
+            $full = $fullMatches[$index];
+            $hasLeadingMinus = strpos($full, '-' . $name) === 0;
+            $argument = trim(str_replace(['-' . $name, $name], '', $full), '()');
 
-            if (strpos($formulaInFunction, '-') !== false) {
-                $minus = true;
-            }
+            $node = $this->treeNodes[$this->parseFormula($argument)];
+            $keyNode = 'function_' . $name . '_' . $index;
+            $this->treeNodes[$keyNode] = TreeNode::newNode(
+                $node,
+                FunctionFactory::make($name),
+                TreeNode::newNumber($hasLeadingMinus ? -1 : 1)
+            );
 
-            $number = $this->treeNodes[$this->parseFormula($formulaInFunction)];
-            $keyNode = 'function_' . $item . '_' . $key;
-            $this->treeNodes[$keyNode] = TreeNode::newNode($number, FunctionFactory::make($item), TreeNode::newNumber($minus ? -1 : 1));
-
-            $formula = str_replace($functionNumberList[$key], $keyNode, $formula);
+            $formula = str_replace($full, $keyNode, $formula);
         }
 
         return $formula;

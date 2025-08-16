@@ -6,11 +6,11 @@ use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 
 class TreeNode
 {
-    /** @var FunctionInterface */
+    /** @var FunctionInterface|null */
     private $function;
-    /** @var TreeNode|null  */
+    /** @var TreeNode|null */
     private $right;
-    /** @var TreeNode|null  */
+    /** @var TreeNode|null */
     private $left;
 
     public $result = 0;
@@ -80,7 +80,7 @@ class TreeNode
     }
 #endregion
 
-    public function __construct(TreeNode $left = null, FunctionInterface $function = null, TreeNode $right = null)
+    public function __construct(?TreeNode $left = null, ?FunctionInterface $function = null, ?TreeNode $right = null)
     {
         $this->left = $left;
         $this->function = $function;
