@@ -6,7 +6,10 @@ namespace CarrionGrow\FormulaParser;
 
 class Config
 {
-    private static $instance;
+    /**
+     * @var Config|null
+     */
+    private static $instance = null;
 
     /**
      * @var bool
@@ -19,7 +22,7 @@ class Config
 
     public static function getInstance(): Config
     {
-        return self::$instance ?? self::$instance = new Config();
+        return self::$instance ?? self::$instance = new self();
     }
 
     public function isSkipError(): bool

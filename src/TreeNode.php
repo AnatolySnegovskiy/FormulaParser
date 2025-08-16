@@ -26,7 +26,7 @@ class TreeNode
     /**
      * @var float
      */
-    public $result = 0.0;
+    private $result = 0.0;
 
     public function getFunction(): ?FunctionInterface
     {
@@ -91,7 +91,7 @@ class TreeNode
 
     public function getResult(): float
     {
-        if (!empty($this->function)) {
+        if ($this->function !== null && $this->left !== null && $this->right !== null) {
             $this->result = $this->function->calculate($this->left->getResult(), $this->right->getResult());
         }
 

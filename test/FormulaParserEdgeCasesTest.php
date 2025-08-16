@@ -8,6 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class FormulaParserEdgeCasesTest extends TestCase
 {
+    public function testCalculateWithoutSettingFormulaThrows(): void
+    {
+        $parser = new FormulaParser();
+        $this->expectException(\Exception::class);
+        $parser->calculate();
+    }
+
     public function testEmptyFormulaThrowsException(): void
     {
         $this->expectException(\Exception::class);

@@ -21,9 +21,9 @@ class FormulaParser
     private $variableNodes = [];
 
     /**
-     * @var TreeNode
+     * @var TreeNode|null
      */
-    private $lastNode;
+    private $lastNode = null;
 
     public function getConfig(): Config
     {
@@ -43,13 +43,20 @@ class FormulaParser
     {
         foreach ($this->variableNodes as $key => $variable) {
             if (isset($variables[$key])) {
-                $variable->result = $variables[$key];
+                $variable->setResult((float) $variables[$key]);
             }
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function calculate(): float
     {
+        if ($this->lastNode === null) {
+            throw new Exception('Formula is not set');
+        }
+
         return $this->lastNode->getResult();
     }
 
@@ -70,6 +77,8 @@ class FormulaParser
         $numeric = '';
         $firstItem = true;
         $charList = str_split($formula);
+        /** @var FunctionInterface|null $function */
+        $function = null;
 
         while (($char = array_shift($charList)) !== null) {
             if (((isset($function) || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
@@ -99,10 +108,10 @@ class FormulaParser
                 $numeric = '';
             }
 
-            if (count($numericList) % 2 === 0 && !empty($function)) {
+            if (count($numericList) % 2 === 0 && $function !== null) {
                 $numericList[] = $this->makeTree($numericList, $function);
-                unset($function);
-            } elseif (isset(FunctionFactory::$map[$char]) && empty($function) && !$firstItem) {
+                $function = null;
+            } elseif (isset(FunctionFactory::$map[$char]) && $function === null && !$firstItem) {
                 $function = FunctionFactory::make($char);
             }
 
@@ -120,6 +129,10 @@ class FormulaParser
     {
         $second = array_pop($numericList);
         $first = array_pop($numericList);
+
+        if ($first === null || $second === null) {
+            throw new Exception('Numeric list must contain two operands');
+        }
 
         if (in_array($function->getKey(), ['*', '/'], true) && $first->getRight() !== null) {
             $node = TreeNode::newNode($first->getRight(), $function, $second);
