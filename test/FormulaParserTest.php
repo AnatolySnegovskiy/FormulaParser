@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
+use CarrionGrow\FormulaParser\Config;
+use CarrionGrow\FormulaParser\FormulaParser;
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserTest extends TestCase

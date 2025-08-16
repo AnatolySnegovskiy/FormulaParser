@@ -20,8 +20,12 @@
         "vimeo/psalm": "^5"
     },
     "autoload": {
-        "psr-4": {"CarrionGrow\\FormulaParser\\": "src/"},
-        "exclude-from-classmap": ["/test/"]
+        "psr-4": {
+            "CarrionGrow\\FormulaParser\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "CarrionGrow\\FormulaParser\\Test\\": "test/"
     },
     "minimum-stability": "dev"
 }

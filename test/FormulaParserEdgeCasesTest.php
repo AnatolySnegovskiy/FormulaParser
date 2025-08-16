@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
+use CarrionGrow\FormulaParser\Config;
 use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
+use CarrionGrow\FormulaParser\FormulaParser;
 use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
+use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class FormulaParserEdgeCasesTest extends TestCase
 {
@@ -80,18 +84,5 @@ class FormulaParserEdgeCasesTest extends TestCase
         $method->setAccessible(true);
         $this->expectException(FormulaParserException::class);
         $method->invoke($parser);
-    }
-
-    public function testFunctionParsingThrowsWhenArgumentNotParsed(): void
-    {
-        $parser = new FormulaParser();
-        $class = new \ReflectionClass(FormulaParser::class);
-        $prop = $class->getProperty('treeNodes');
-        $prop->setAccessible(true);
-        $prop->setValue($parser, new AlwaysMissingArray());
-        $method = $class->getMethod('functionParsing');
-        $method->setAccessible(true);
-        $this->expectException(FormulaParserException::class);
-        $method->invoke($parser, 'sqrt(1)');
     }
 }

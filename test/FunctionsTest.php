@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
 use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use CarrionGrow\FormulaParser\Functions\Abs;

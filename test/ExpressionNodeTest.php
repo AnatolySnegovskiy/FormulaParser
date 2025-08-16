@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace CarrionGrow\FormulaParser;
+namespace CarrionGrow\FormulaParser\Test;
 
+use CarrionGrow\FormulaParser\ExpressionNode;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 use Mockery;
 use PHPUnit\Framework\TestCase;

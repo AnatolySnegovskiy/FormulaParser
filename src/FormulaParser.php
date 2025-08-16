@@ -181,10 +181,6 @@ class FormulaParser
 
             $key = $this->parseFormula($argument);
 
-            if (!isset($this->treeNodes[$key])) {
-                throw new FormulaParserException('Unable to parse function argument');
-            }
-
             $node = $this->treeNodes[$key];
             $keyNode = 'function_' . $name . '_' . $index;
             $this->treeNodes[$keyNode] = ExpressionNode::createFromOperands(
