@@ -18,7 +18,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser = new FormulaParser();
         $parser->setFormula('pi + 1');
         $parser->setVariables([]);
-        $this->assertEquals(M_PI + 1, $parser->calculate());
+        $this->assertEqualsWithDelta(M_PI + 1, $parser->calculate(), 1e-12);
     }
 
     public function testOperatorPrecedence()

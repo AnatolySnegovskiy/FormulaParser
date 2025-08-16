@@ -6,6 +6,13 @@ use PHPUnit\Framework\TestCase;
 
 class FormulaParserTest extends TestCase
 {
+    public function testGetConfig()
+    {
+        $parser = new FormulaParser();
+
+        $this->assertEquals(Config::getInstance(), $parser->getConfig());
+    }
+
     public function testParseAndCalculateMultiply()
     {
         $parser = new FormulaParser();

@@ -52,6 +52,10 @@ class TreeNodeTest extends TestCase
         $left = TreeNode::newNumber(1);
         $right = TreeNode::newNumber(2);
         $function = Mockery::mock(FunctionInterface::class);
+        $function->shouldReceive('calculate')
+            ->once()
+            ->with(1.0, 2.0)
+            ->andReturn(3.0);
 
         $node = new TreeNode();
         $node->setLeft($left)
