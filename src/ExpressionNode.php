@@ -69,8 +69,11 @@ class ExpressionNode
         $this->result = $result;
     }
 
-    public function __construct(?ExpressionNode $left = null, ?FunctionInterface $operation = null, ?ExpressionNode $right = null)
-    {
+    public function __construct(
+        ?ExpressionNode $left = null,
+        ?FunctionInterface $operation = null,
+        ?ExpressionNode $right = null
+    ) {
         $this->leftNode = $left;
         $this->operation = $operation;
         $this->rightNode = $right;
@@ -84,8 +87,11 @@ class ExpressionNode
         return $node;
     }
 
-    public static function createFromOperands(ExpressionNode $left, FunctionInterface $operation, ExpressionNode $right): self
-    {
+    public static function createFromOperands(
+        ExpressionNode $left,
+        FunctionInterface $operation,
+        ExpressionNode $right
+    ): self {
         return new self($left, $operation, $right);
     }
 
