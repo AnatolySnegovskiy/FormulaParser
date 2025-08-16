@@ -5,21 +5,19 @@ declare(strict_types=1);
 namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
-use CarrionGrow\FormulaParser\Functions\{
-    Abs,
-    Add,
-    Cos,
-    Degree,
-    Divide,
-    Exp,
-    FunctionRegistry,
-    Log,
-    Multiply,
-    Sin,
-    Sqrt,
-    Subtract,
-    Tan
-};
+use CarrionGrow\FormulaParser\Functions\Abs;
+use CarrionGrow\FormulaParser\Functions\Add;
+use CarrionGrow\FormulaParser\Functions\Cos;
+use CarrionGrow\FormulaParser\Functions\Degree;
+use CarrionGrow\FormulaParser\Functions\Divide;
+use CarrionGrow\FormulaParser\Functions\Exp;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
+use CarrionGrow\FormulaParser\Functions\Log;
+use CarrionGrow\FormulaParser\Functions\Multiply;
+use CarrionGrow\FormulaParser\Functions\Sin;
+use CarrionGrow\FormulaParser\Functions\Sqrt;
+use CarrionGrow\FormulaParser\Functions\Subtract;
+use CarrionGrow\FormulaParser\Functions\Tan;
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
