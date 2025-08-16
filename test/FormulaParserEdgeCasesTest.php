@@ -5,7 +5,40 @@ declare(strict_types=1);
 namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
 use PHPUnit\Framework\TestCase;
+
+class AlwaysMissingArray implements \ArrayAccess
+{
+    /**
+     * @var array
+     */
+    private $storage = [];
+
+    public function offsetExists($offset): bool
+    {
+        return false;
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->storage[$offset] ?? null;
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        if ($offset === null) {
+            $this->storage[] = $value;
+        } else {
+            $this->storage[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset): void
+    {
+        unset($this->storage[$offset]);
+    }
+}
 
 class FormulaParserEdgeCasesTest extends TestCase
 {
@@ -45,7 +78,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->setFormula('a / b');
         $parser->setVariables(['a' => 1, 'b' => 0]);
 
-        $config = ParserConfig::getInstance();
+        $config = Config::getInstance();
         $config->setSkipError(true);
         $this->assertEquals(0.0, $parser->calculate());
 
@@ -61,5 +94,36 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->setFormula('sin(-5)');
         $parser->setVariables([]);
         $this->assertEquals(sin(deg2rad(-5)), $parser->calculate());
+    }
+
+    public function testMakeTreeThrowsWhenOperandsMissing(): void
+    {
+        $parser = new FormulaParser();
+        $method = new \ReflectionMethod(FormulaParser::class, 'makeTree');
+        $method->setAccessible(true);
+        $this->expectException(FormulaParserException::class);
+        $method->invoke($parser, [], FunctionRegistry::create('+'));
+    }
+
+    public function testGetLastKeyThrowsWhenTreeEmpty(): void
+    {
+        $parser = new FormulaParser();
+        $method = new \ReflectionMethod(FormulaParser::class, 'getLastKey');
+        $method->setAccessible(true);
+        $this->expectException(FormulaParserException::class);
+        $method->invoke($parser);
+    }
+
+    public function testFunctionParsingThrowsWhenArgumentNotParsed(): void
+    {
+        $parser = new FormulaParser();
+        $class = new \ReflectionClass(FormulaParser::class);
+        $prop = $class->getProperty('treeNodes');
+        $prop->setAccessible(true);
+        $prop->setValue($parser, new AlwaysMissingArray());
+        $method = $class->getMethod('functionParsing');
+        $method->setAccessible(true);
+        $this->expectException(FormulaParserException::class);
+        $method->invoke($parser, 'sqrt(1)');
     }
 }

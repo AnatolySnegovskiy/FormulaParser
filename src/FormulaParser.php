@@ -25,9 +25,9 @@ class FormulaParser
      */
     private $lastNode = null;
 
-    public function getConfig(): ParserConfig
+    public function getConfig(): Config
     {
-        return ParserConfig::getInstance();
+        return Config::getInstance();
     }
 
     /**

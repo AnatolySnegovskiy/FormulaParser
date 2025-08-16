@@ -12,7 +12,7 @@ class FormulaParserTest extends TestCase
     {
         $parser = new FormulaParser();
 
-        $this->assertEquals(ParserConfig::getInstance(), $parser->getConfig());
+        $this->assertEquals(Config::getInstance(), $parser->getConfig());
     }
 
     public function testParseAndCalculateMultiply(): void

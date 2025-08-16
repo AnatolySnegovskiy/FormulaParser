@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CarrionGrow\FormulaParser\Functions;
 
 use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
-use CarrionGrow\FormulaParser\ParserConfig;
+use CarrionGrow\FormulaParser\Config;
 
 class Divide extends AbstractFunction
 {
@@ -14,7 +14,7 @@ class Divide extends AbstractFunction
      */
     public function calculate(float $left, float $right): float
     {
-        if (empty($right) && ParserConfig::getInstance()->isSkipError()) {
+        if (empty($right) && Config::getInstance()->isSkipError()) {
             return 0;
         }
 
