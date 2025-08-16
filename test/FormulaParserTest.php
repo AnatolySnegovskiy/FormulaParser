@@ -62,12 +62,19 @@ class FormulaParserTest extends TestCase
     public function testParseAndCalculateFullInAll(): void
     {
         $parser = new FormulaParser();
-        $parser->setFormula('(a ^ b) + sin(a) - cos(b) * (cos(b) - tan(c) * d) - (b + c / d * a - b) + tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)');
+        $parser->setFormula(
+            '(a ^ b) + sin(a) - cos(b) * (cos(b) - tan(c) * d) - '
+            . '(b + c / d * a - b) + tan(c) / exp(d) + abs(e) - log(f) * sqrt(g)'
+        );
 
         $vars = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => -5, 'f' => 6, 'g' => 7];
         $parser->setVariables($vars);
-        $expected = (1 ** 2) + sin(deg2rad(1)) - cos(deg2rad(2)) * (cos(deg2rad(2)) - tan(deg2rad(3)) * 4) - (2 + 3 / 4 * 1 - 2) + tan(deg2rad(3)) / exp(4) + abs(-5) - log(6) * sqrt(7);
+        $expected = (1 ** 2) + sin(deg2rad(1)) - cos(deg2rad(2))
+            * (cos(deg2rad(2)) - tan(deg2rad(3)) * 4)
+            - (2 + 3 / 4 * 1 - 2)
+            + tan(deg2rad(3)) / exp(4)
+            + abs(-5)
+            - log(6) * sqrt(7);
         $this->assertEquals($expected, $parser->calculate());
     }
 }
-

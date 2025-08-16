@@ -20,7 +20,7 @@ class FunctionFactory
         'exp' => Exp::class,
         'abs' => Abs::class,
         'log' => Log::class,
-        'sqrt'=> Sqrt::class,
+        'sqrt' => Sqrt::class,
         'tan' => Tan::class,
     ];
 

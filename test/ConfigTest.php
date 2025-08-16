@@ -33,4 +33,3 @@ class ConfigTest extends TestCase
         $config->setSkipError(false);
     }
 }
-

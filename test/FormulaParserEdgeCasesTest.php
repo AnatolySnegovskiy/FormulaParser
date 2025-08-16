@@ -55,4 +55,3 @@ class FormulaParserEdgeCasesTest extends TestCase
         $this->assertEquals(sin(deg2rad(-5)), $parser->calculate());
     }
 }
-

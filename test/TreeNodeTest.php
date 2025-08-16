@@ -71,4 +71,3 @@ class TreeNodeTest extends TestCase
         $this->assertSame(3.0, $node->getResult());
     }
 }
-

@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
-use CarrionGrow\FormulaParser\Functions\{Abs, Add, Cos, Degree, Divide, Exp, FunctionFactory, FunctionInterface, Log, Multiply, Sin, Sqrt, Subtract, Tan};
+use CarrionGrow\FormulaParser\Functions\{
+    Abs,
+    Add,
+    Cos,
+    Degree,
+    Divide,
+    Exp,
+    FunctionFactory,
+    FunctionInterface,
+    Log,
+    Multiply,
+    Sin,
+    Sqrt,
+    Subtract,
+    Tan
+};
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
@@ -45,4 +60,3 @@ class FunctionsTest extends TestCase
         (new Divide('/'))->calculate(1, 0);
     }
 }
-

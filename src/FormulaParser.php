@@ -76,9 +76,13 @@ class FormulaParser
                 $numeric .= $char;
             }
 
-            if ((empty($charList) || in_array($char, [' ', '+', '-', '*', '/', '^'])) && !empty($numeric) && $numeric !== '-') {
+            if (
+                (empty($charList) || in_array($char, [' ', '+', '-', '*', '/', '^']))
+                && !empty($numeric)
+                && $numeric !== '-'
+            ) {
                 if (strpos($numeric, 'pi') !== false) {
-                    $numeric = str_replace('pi', M_PI, $numeric);
+                    $numeric = str_replace('pi', (string) M_PI, $numeric);
                 }
 
                 $keyNumber = is_numeric($numeric) ? $numeric . '_' . count($this->treeNodes) : $numeric;
