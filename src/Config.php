@@ -6,7 +6,10 @@ namespace CarrionGrow\FormulaParser;
 
 class Config
 {
-    private static $instance;
+    /**
+     * @var Config|null
+     */
+    private static $instance = null;
 
     /**
      * @var bool

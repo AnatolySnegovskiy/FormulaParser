@@ -7,7 +7,7 @@ namespace CarrionGrow\FormulaParser\Functions;
 class FunctionFactory
 {
     /**
-     * @var array<string, string>
+     * @var array<string, class-string<FunctionInterface>>
      */
     public static $map = [
         '*'   => Multiply::class,
@@ -26,6 +26,8 @@ class FunctionFactory
 
     public static function make(string $function): FunctionInterface
     {
-        return new self::$map[$function]($function);
+        $class = self::$map[$function];
+
+        return new $class($function);
     }
 }

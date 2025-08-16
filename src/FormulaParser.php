@@ -71,8 +71,11 @@ class FormulaParser
         $firstItem = true;
         $charList = str_split($formula);
 
+        /** @var FunctionInterface|null $function */
+        $function = null;
+
         while (($char = array_shift($charList)) !== null) {
-            if (((isset($function) || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
+            if ((($function !== null || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
                 $numeric .= $char;
             }
 
@@ -99,10 +102,10 @@ class FormulaParser
                 $numeric = '';
             }
 
-            if (count($numericList) % 2 === 0 && !empty($function)) {
+            if (count($numericList) % 2 === 0 && $function !== null) {
                 $numericList[] = $this->makeTree($numericList, $function);
-                unset($function);
-            } elseif (isset(FunctionFactory::$map[$char]) && empty($function) && !$firstItem) {
+                $function = null;
+            } elseif (isset(FunctionFactory::$map[$char]) && $function === null && !$firstItem) {
                 $function = FunctionFactory::make($char);
             }
 
@@ -120,6 +123,10 @@ class FormulaParser
     {
         $second = array_pop($numericList);
         $first = array_pop($numericList);
+
+        if (!$second || !$first) {
+            throw new \LogicException('Not enough operands to build tree');
+        }
 
         if (in_array($function->getKey(), ['*', '/'], true) && $first->getRight() !== null) {
             $node = TreeNode::newNode($first->getRight(), $function, $second);
