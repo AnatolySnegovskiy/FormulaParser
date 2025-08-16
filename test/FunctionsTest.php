@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use CarrionGrow\FormulaParser\Functions\{
     Abs,
     Add,
@@ -55,7 +56,13 @@ class FunctionsTest extends TestCase
 
     public function testDivideByZeroThrows(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         (new Divide('/'))->calculate(1, 0);
+    }
+
+    public function testCreateUnknownFunctionThrowsException(): void
+    {
+        $this->expectException(FormulaParserException::class);
+        FunctionRegistry::create('%');
     }
 }

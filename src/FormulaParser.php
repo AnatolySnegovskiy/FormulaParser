@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
-use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
-use Exception;
+use CarrionGrow\FormulaParser\Functions\FunctionRegistry;
 
 class FormulaParser
 {
@@ -31,7 +31,7 @@ class FormulaParser
     }
 
     /**
-     * @throws Exception
+     * @throws FormulaParserException
      */
     public function setFormula(string $formula): void
     {
@@ -49,24 +49,24 @@ class FormulaParser
     }
 
     /**
-     * @throws Exception
+     * @throws FormulaParserException
      */
     public function calculate(): float
     {
         if ($this->lastNode === null) {
-            throw new Exception('Formula is not set');
+            throw new FormulaParserException('Formula is not set');
         }
 
         return $this->lastNode->getResult();
     }
 
     /**
-     * @throws Exception
+     * @throws FormulaParserException
      */
     private function parseFormula(string $formula): string
     {
         if ($formula === '') {
-            throw new Exception('Empty Formula');
+            throw new FormulaParserException('Empty Formula');
         }
 
         $formula = $this->functionParsing($formula);
@@ -122,8 +122,10 @@ class FormulaParser
     }
 
     /**
-     * @param ExpressionNode[]        $numericList
+     * @param ExpressionNode[]  $numericList
      * @param FunctionInterface $function
+     *
+     * @throws FormulaParserException
      */
     private function makeTree(array $numericList, FunctionInterface $function): ExpressionNode
     {
@@ -131,7 +133,7 @@ class FormulaParser
         $first = array_pop($numericList);
 
         if ($first === null || $second === null) {
-            throw new Exception('Numeric list must contain two operands');
+            throw new FormulaParserException('Numeric list must contain two operands');
         }
 
         $right = $first->getRightNode();
@@ -149,7 +151,7 @@ class FormulaParser
 
     /**
      * @return string
-     * @throws Exception
+     * @throws FormulaParserException
      */
     private function getLastKey(): string
     {
@@ -157,14 +159,14 @@ class FormulaParser
         $lastKey = end($keys);
 
         if ($lastKey === false) {
-            throw new Exception('Tree is empty');
+            throw new FormulaParserException('Tree is empty');
         }
 
         return (string) $lastKey;
     }
 
     /**
-     * @throws Exception
+     * @throws FormulaParserException
      */
     private function functionParsing(string $formula): string
     {
@@ -180,7 +182,7 @@ class FormulaParser
             $key = $this->parseFormula($argument);
 
             if (!isset($this->treeNodes[$key])) {
-                throw new Exception('Unable to parse function argument');
+                throw new FormulaParserException('Unable to parse function argument');
             }
 
             $node = $this->treeNodes[$key];
@@ -198,7 +200,7 @@ class FormulaParser
     }
 
     /**
-     * @throws Exception
+     * @throws FormulaParserException
      */
     private function bracketsParsing(string $formula): string
     {

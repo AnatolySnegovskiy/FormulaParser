@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
+use CarrionGrow\FormulaParser\Exceptions\FormulaParserException;
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserEdgeCasesTest extends TestCase
@@ -11,13 +12,13 @@ class FormulaParserEdgeCasesTest extends TestCase
     public function testCalculateWithoutSettingFormulaThrows(): void
     {
         $parser = new FormulaParser();
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         $parser->calculate();
     }
 
     public function testEmptyFormulaThrowsException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         $parser = new FormulaParser();
         $parser->setFormula('');
     }
@@ -50,7 +51,7 @@ class FormulaParserEdgeCasesTest extends TestCase
 
         $config->setSkipError(false);
         $parser->setVariables(['a' => 1, 'b' => 0]);
-        $this->expectException(\Exception::class);
+        $this->expectException(FormulaParserException::class);
         $parser->calculate();
     }
 
