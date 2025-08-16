@@ -38,3 +38,6 @@ jobs:
           tools: composer:v2
       - run: composer install --prefer-dist --no-progress
       - run: XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover=coverage.xml
+      - name: Enforce 100% coverage
+        run: |
+          php -r '$xml=new SimpleXMLElement(file_get_contents("coverage.xml")); $m=$xml->project->metrics; $elements=(int)$m["elements"]; $covered=(int)$m["coveredelements"]; $pct=$elements?($covered/$elements*100):0; $msg=sprintf("Total coverage: %.2f%%", $pct); echo $msg . PHP_EOL; file_put_contents(getenv("GITHUB_STEP_SUMMARY"), $msg . PHP_EOL); if ($covered < $elements) { fwrite(STDERR, "Coverage must be 100%\n"); exit(1); }'
