@@ -32,6 +32,12 @@ class FunctionsTest extends TestCase
         $this->assertInstanceOf(Divide::class, FunctionFactory::make('/'));
     }
 
+    public function testFactoryThrowsOnUnknownFunction(): void
+    {
+        $this->expectException(\LogicException::class);
+        FunctionFactory::make('%');
+    }
+
     public function testAllFunctionCalculations(): void
     {
         $this->assertEquals(5, (new Add('+'))->calculate(2, 3));

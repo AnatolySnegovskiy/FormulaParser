@@ -7,23 +7,24 @@ namespace CarrionGrow\FormulaParser;
 use CarrionGrow\FormulaParser\Functions\FunctionFactory;
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
 use Exception;
+use LogicException;
 
 class FormulaParser
 {
     /**
-     * @var TreeNode[]
+     * @var array<string, TreeNode>
      */
     private $treeNodes = [];
 
     /**
-     * @var TreeNode[]
+     * @var array<string, TreeNode>
      */
     private $variableNodes = [];
 
     /**
-     * @var TreeNode
+     * @var TreeNode|null
      */
-    private $lastNode;
+    private $lastNode = null;
 
     public function getConfig(): Config
     {
@@ -36,20 +37,32 @@ class FormulaParser
     public function setFormula(string $formula): void
     {
         $this->parseFormula($formula);
-        $this->lastNode = $this->treeNodes[$this->getLastKey()];
+        $lastKey = $this->getLastKey();
+        if (!isset($this->treeNodes[$lastKey])) {
+            throw new LogicException('Last node not found');
+        }
+
+        $this->lastNode = $this->treeNodes[$lastKey];
     }
 
+    /**
+     * @param array<string, float> $variables
+     */
     public function setVariables(array $variables): void
     {
         foreach ($this->variableNodes as $key => $variable) {
             if (isset($variables[$key])) {
-                $variable->result = $variables[$key];
+                $variable->result = (float) $variables[$key];
             }
         }
     }
 
     public function calculate(): float
     {
+        if ($this->lastNode === null) {
+            throw new LogicException('No formula parsed');
+        }
+
         return $this->lastNode->getResult();
     }
 
@@ -71,8 +84,11 @@ class FormulaParser
         $firstItem = true;
         $charList = str_split($formula);
 
+        /** @var FunctionInterface|null $function */
+        $function = null;
+
         while (($char = array_shift($charList)) !== null) {
-            if (((isset($function) || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
+            if ((($function !== null || $firstItem) && $char === '-') || preg_match('/[a-z\.0-9_]/ui', $char)) {
                 $numeric .= $char;
             }
 
@@ -99,10 +115,10 @@ class FormulaParser
                 $numeric = '';
             }
 
-            if (count($numericList) % 2 === 0 && !empty($function)) {
+            if (count($numericList) % 2 === 0 && $function !== null) {
                 $numericList[] = $this->makeTree($numericList, $function);
-                unset($function);
-            } elseif (isset(FunctionFactory::$map[$char]) && empty($function) && !$firstItem) {
+                $function = null;
+            } elseif (isset(FunctionFactory::$map[$char]) && $function === null && !$firstItem) {
                 $function = FunctionFactory::make($char);
             }
 
@@ -121,6 +137,10 @@ class FormulaParser
         $second = array_pop($numericList);
         $first = array_pop($numericList);
 
+        if (!$second || !$first) {
+            throw new \LogicException('Not enough operands to build tree');
+        }
+
         if (in_array($function->getKey(), ['*', '/'], true) && $first->getRight() !== null) {
             $node = TreeNode::newNode($first->getRight(), $function, $second);
             $first->setRight($node);
@@ -133,11 +153,16 @@ class FormulaParser
     }
 
     /**
-     * @return int|string
+     * @return string
      */
-    private function getLastKey()
+    private function getLastKey(): string
     {
-        return array_keys($this->treeNodes)[count($this->treeNodes) - 1];
+        $key = array_key_last($this->treeNodes);
+        if ($key === null) {
+            throw new LogicException('No tree nodes available');
+        }
+
+        return (string) $key;
     }
 
     /**
@@ -154,7 +179,12 @@ class FormulaParser
             $hasLeadingMinus = strpos($full, '-' . $name) === 0;
             $argument = trim(str_replace(['-' . $name, $name], '', $full), '()');
 
-            $node = $this->treeNodes[$this->parseFormula($argument)];
+            $keyArgument = $this->parseFormula($argument);
+            if (!isset($this->treeNodes[$keyArgument])) {
+                throw new LogicException('Node not found: ' . $keyArgument);
+            }
+
+            $node = $this->treeNodes[$keyArgument];
             $keyNode = 'function_' . $name . '_' . $index;
             $this->treeNodes[$keyNode] = TreeNode::newNode(
                 $node,

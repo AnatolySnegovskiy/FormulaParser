@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CarrionGrow\FormulaParser;
 
+use CarrionGrow\FormulaParser\Functions\FunctionFactory;
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserEdgeCasesTest extends TestCase
@@ -53,5 +54,44 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->setFormula('sin(-5)');
         $parser->setVariables([]);
         $this->assertEquals(sin(deg2rad(-5)), $parser->calculate());
+    }
+
+    public function testCalculateWithoutFormulaThrows(): void
+    {
+        $parser = new FormulaParser();
+        $this->expectException(\LogicException::class);
+        $parser->calculate();
+    }
+
+    public function testLeadingNegativeFunction(): void
+    {
+        $parser = new FormulaParser();
+        $parser->setFormula('-sin(a)');
+        $parser->setVariables(['a' => 30]);
+        $this->assertEquals(-sin(deg2rad(30)), $parser->calculate());
+    }
+
+    public function testGetLastKeyThrowsWhenNoNodes(): void
+    {
+        $parser = new FormulaParser();
+        $ref = new \ReflectionClass(FormulaParser::class);
+        $method = $ref->getMethod('getLastKey');
+        $method->setAccessible(true);
+
+        $this->expectException(\LogicException::class);
+        $method->invoke($parser);
+    }
+
+    public function testMakeTreeThrowsWhenOperandsMissing(): void
+    {
+        $parser = new FormulaParser();
+        $ref = new \ReflectionClass(FormulaParser::class);
+        $method = $ref->getMethod('makeTree');
+        $method->setAccessible(true);
+
+        $this->expectException(\LogicException::class);
+        $nodes = [TreeNode::newNumber(1)];
+        $function = FunctionFactory::make('+');
+        $method->invoke($parser, $nodes, $function);
     }
 }
