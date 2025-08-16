@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 use CarrionGrow\FormulaParser\Functions\FunctionInterface;
@@ -19,7 +21,7 @@ class TreeNodeTest extends TestCase
     /**
      * Verify that a numeric node created via newNumber keeps the provided value.
      */
-    public function testNewNumberHoldsResult()
+    public function testNewNumberHoldsResult(): void
     {
         $node = TreeNode::newNumber(10);
         $this->assertSame(10.0, $node->getResult());
@@ -28,7 +30,7 @@ class TreeNodeTest extends TestCase
     /**
      * Ensure getResult invokes the assigned function with left and right results.
      */
-    public function testGetResultUsesFunction()
+    public function testGetResultUsesFunction(): void
     {
         $left = TreeNode::newNumber(2);
         $right = TreeNode::newNumber(3);
@@ -47,7 +49,7 @@ class TreeNodeTest extends TestCase
     /**
      * Cover all getter and setter combinations.
      */
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $left = TreeNode::newNumber(1);
         $right = TreeNode::newNumber(2);

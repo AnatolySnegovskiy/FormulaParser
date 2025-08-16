@@ -1,30 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 class Config
 {
     private static $instance;
+
+    /**
+     * @var bool
+     */
     private $skipError = false;
 
-    private function __construct(){}
+    private function __construct()
+    {
+    }
 
     public static function getInstance(): Config
     {
         return self::$instance ?? self::$instance = new Config();
     }
 
-    /**
-     * @return bool
-     */
     public function isSkipError(): bool
     {
         return $this->skipError;
     }
 
-    /**
-     * @param bool $skipError
-     */
     public function setSkipError(bool $skipError): void
     {
         $this->skipError = $skipError;

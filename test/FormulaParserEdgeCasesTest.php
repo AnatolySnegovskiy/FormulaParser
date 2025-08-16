@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 use PHPUnit\Framework\TestCase;
 
 class FormulaParserEdgeCasesTest extends TestCase
 {
-    public function testEmptyFormulaThrowsException()
+    public function testEmptyFormulaThrowsException(): void
     {
         $this->expectException(\Exception::class);
         $parser = new FormulaParser();
         $parser->setFormula('');
     }
 
-    public function testPiConstant()
+    public function testPiConstant(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('pi + 1');
@@ -21,7 +23,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $this->assertEqualsWithDelta(M_PI + 1, $parser->calculate(), 1e-12);
     }
 
-    public function testOperatorPrecedence()
+    public function testOperatorPrecedence(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('1 + 2 * 3');
@@ -29,7 +31,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $this->assertEquals(7.0, $parser->calculate());
     }
 
-    public function testDivideByZeroBehaviour()
+    public function testDivideByZeroBehaviour(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('a / b');
@@ -45,7 +47,7 @@ class FormulaParserEdgeCasesTest extends TestCase
         $parser->calculate();
     }
 
-    public function testNegativeFunctionArgument()
+    public function testNegativeFunctionArgument(): void
     {
         $parser = new FormulaParser();
         $parser->setFormula('sin(-5)');

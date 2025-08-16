@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CarrionGrow\FormulaParser;
 
 use PHPUnit\Framework\TestCase;
@@ -12,7 +14,7 @@ class ConfigTest extends TestCase
     /**
      * getInstance should always return the same object.
      */
-    public function testGetInstanceReturnsSameObject()
+    public function testGetInstanceReturnsSameObject(): void
     {
         $first = Config::getInstance();
         $second = Config::getInstance();
@@ -22,7 +24,7 @@ class ConfigTest extends TestCase
     /**
      * Skip error flag must be configurable.
      */
-    public function testSetAndGetSkipError()
+    public function testSetAndGetSkipError(): void
     {
         $config = Config::getInstance();
         $config->setSkipError(true);
